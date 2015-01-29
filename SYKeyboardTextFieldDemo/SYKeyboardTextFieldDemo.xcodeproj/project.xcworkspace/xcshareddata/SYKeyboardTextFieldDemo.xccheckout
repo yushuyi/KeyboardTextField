@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>564EA73C-149C-4C7E-833B-6F7B8284793C</string>
+	<key>IDESourceControlProjectName</key>
+	<string>SYKeyboardTextFieldDemo</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>511F8F817E53F0962706C08958EE2371E64696D1</key>
+		<string>https://github.com/441088327/SYKeyboardTextField.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>SYKeyboardTextFieldDemo/SYKeyboardTextFieldDemo.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>511F8F817E53F0962706C08958EE2371E64696D1</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/441088327/SYKeyboardTextField.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>511F8F817E53F0962706C08958EE2371E64696D1</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>511F8F817E53F0962706C08958EE2371E64696D1</string>
+			<key>IDESourceControlWCCName</key>
+			<string>SYKeyboardTextField</string>
+		</dict>
+	</array>
+</dict>
+</plist>
