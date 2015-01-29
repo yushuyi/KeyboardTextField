@@ -97,6 +97,11 @@ class SYKeyboardTextField: UIView {
             self.setNeedsLayout()
         }
     }
+    
+    var text : String {
+        return textView.text
+    }
+    
     var maxNumberOfWords : Int = 140
     var minNumberOfWords : Int = 0
     var maxNumberOfLines : Int = 4
@@ -170,6 +175,7 @@ class SYKeyboardTextField: UIView {
         
     }
 
+    
     
     func show () {
         self.textView.becomeFirstResponder()
