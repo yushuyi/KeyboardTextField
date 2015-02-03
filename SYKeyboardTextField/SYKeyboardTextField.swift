@@ -152,7 +152,7 @@ class SYKeyboardTextField: UIView {
         placeholderLabel.backgroundColor = UIColor.clearColor()
         placeholderLabel.textColor = UIColor.lightGrayColor()
         placeholderLabel.font = textView.font;
-        placeholderLabel.hidden = true
+        placeholderLabel.hidden = false
         placeholderLabel.text = "placeholder"
         textView.addSubview(placeholderLabel)
         
@@ -254,6 +254,10 @@ class SYKeyboardTextField: UIView {
                 textViewCurrentHeightForLines(self.textView.numberOfLines())
         )
         textViewBackground.frame = textView.frame;
+        
+        placeholderLabel.sizeToFit()
+        placeholderLabel.origin = CGPointMake(8.0, (textViewDefaultHeight - placeholderLabel.height) / 2 - 2);
+        
     }
  
     deinit {
@@ -442,6 +446,14 @@ extension SYKeyboardTextField {
 extension SYKeyboardTextField : UITextViewDelegate {
     
     func textViewDidChange(textView: UITextView) {
+        
+        if (countElements(textView.text) == 0) {
+            placeholderLabel.hidden = false
+        }
+        else {
+            placeholderLabel.hidden = true
+        }
+        
         self.delegate?.keyboardTextField?(self, didChangeText: self.textView.text)
     }
     
