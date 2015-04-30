@@ -23,7 +23,7 @@ public extension UIView {
     func constraintHeight(constant : CGFloat){
         let constraints = self.constraints()
         for var i = 0 ; i < self.constraints().count ; i++ {
-            var constraint = self.constraints()[i] as NSLayoutConstraint
+            var constraint = self.constraints()[i] as! NSLayoutConstraint
             if constraint.firstAttribute == NSLayoutAttribute.Height {
                constraint.constant = constant
                break
@@ -35,7 +35,7 @@ public extension UIView {
     func constraintCenterX(constant : CGFloat){
         let constraints = self.constraints()
         for var i = 0 ; i < self.constraints().count ; i++ {
-            var constraint = self.constraints()[i] as NSLayoutConstraint
+            var constraint = self.constraints()[i] as! NSLayoutConstraint
             if constraint.firstAttribute == NSLayoutAttribute.CenterX {
                 constraint.constant = constant
                 break
@@ -46,7 +46,7 @@ public extension UIView {
     func constraintCenterY(constant : CGFloat){
         let constraints = self.constraints()
         for var i = 0 ; i < self.constraints().count ; i++ {
-            var constraint = self.constraints()[i] as NSLayoutConstraint
+            var constraint = self.constraints()[i] as! NSLayoutConstraint
             if constraint.firstAttribute == NSLayoutAttribute.CenterY {
                 constraint.constant = constant
                 break

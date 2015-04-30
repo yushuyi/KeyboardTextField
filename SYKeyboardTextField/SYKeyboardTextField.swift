@@ -9,6 +9,10 @@
 import UIKit
 
 
+private var SYKeyboardTextFieldDebugMode : Bool = false
+
+
+
 @objc protocol SYKeyboardTextFieldDelegate : NSObjectProtocol {
 
     //    /**
@@ -99,7 +103,13 @@ class SYKeyboardTextField: UIView {
     }
     
     var text : String {
-        return textView.text
+        get {
+            return textView.text
+        }
+        set {
+            textView.text = newValue
+            self.textViewDidChange(textView)
+        }
     }
     
     var maxNumberOfWords : Int = 140
@@ -109,7 +119,7 @@ class SYKeyboardTextField: UIView {
     
     
     lazy var keyboardView = UIView()
-    lazy var textView = UITextView()
+    lazy var textView = SYKeyboardTextView()
     lazy var placeholderLabel = UILabel()
     lazy var textViewBackground = UIImageView()
     lazy var leftButton = UIButton()
@@ -136,7 +146,7 @@ class SYKeyboardTextField: UIView {
         textView.font = UIFont.systemFontOfSize(15.0);
 //        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
         textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, -1, 0, 1);//滚动指示器 皮条
-        textView.textContainerInset = UIEdgeInsetsMake(8.0, 3.0, 8.0, 0.0);
+        textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
         
         textView.keyboardType = UIKeyboardType.Default;
         textView.returnKeyType = UIReturnKeyType.Done;
@@ -146,6 +156,7 @@ class SYKeyboardTextField: UIView {
         textView.textColor = UIColor(white: 0.200, alpha: 1.000)
         textView.backgroundColor = UIColor.greenColor()
         textView.addObserver(self, forKeyPath: "contentSize", options: NSKeyValueObservingOptions.New, context: nil)
+        textView.scrollsToTop = false
         keyboardView.addSubview(textView)
         
         placeholderLabel.numberOfLines = 1
@@ -201,12 +212,11 @@ class SYKeyboardTextField: UIView {
         self.delegate?.keyboardTextFieldPressRightButton?(self)
     }
     
- 
-    
+  
+    var distance : CGFloat = 8.0
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        var distance : CGFloat = 8.0
         
         var maxWidth : CGFloat = 65.0
         var minWidth : CGFloat = 45.0
@@ -255,13 +265,20 @@ class SYKeyboardTextField: UIView {
         )
         textViewBackground.frame = textView.frame;
         
-        placeholderLabel.sizeToFit()
-        placeholderLabel.origin = CGPointMake(8.0, (textViewDefaultHeight - placeholderLabel.height) / 2 - 2);
-        
+        if placeholderLabel.textAlignment == .Left {
+            placeholderLabel.sizeToFit()
+            placeholderLabel.origin = CGPointMake(8.0, (textViewDefaultHeight - placeholderLabel.height) / 2);
+            
+        }else if placeholderLabel.textAlignment == .Center {
+           placeholderLabel.frame = placeholderLabel.superview!.bounds
+        }
     }
  
     deinit {
-        println("\(NSStringFromClass(self.classForCoder)) has release!")
+        if SYKeyboardTextFieldDebugMode {
+            println("\(NSStringFromClass(self.classForCoder)) has release!")
+        }
+        
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     
@@ -278,7 +295,7 @@ extension SYKeyboardTextField {
         var height = textViewDefaultHeight - self.textView.font.lineHeight
         var lineTotalHeight = self.textView.font.lineHeight * CGFloat(numberOfLines)
         height += CGFloat(roundf(Float(lineTotalHeight)))
-        return height;
+        return CGFloat(Int(height));
     }
     
     private func appropriateInputbarHeight() -> CGFloat
@@ -307,7 +324,11 @@ extension SYKeyboardTextField {
         
         if object.isEqual(self.textView) && keyPath == "contentSize" {
             var newValue = change[NSKeyValueChangeNewKey]?.CGSizeValue()
-//            println("\(newValue)---\(self.appropriateInputbarHeight())")
+            
+            if SYKeyboardTextFieldDebugMode {
+                println("\(newValue)---\(self.appropriateInputbarHeight())")
+            }
+            
             var newKeyboardHeight = self.appropriateInputbarHeight()
             
             if newKeyboardHeight != keyboardView.height && self.superview != nil {
@@ -375,14 +396,17 @@ extension SYKeyboardTextField {
         if !self.window!.keyWindow { return }
         
         if textView.isFirstResponder() {
-            var userInfo = notification.userInfo as [String : AnyObject]
-            var keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as NSValue
+            var userInfo = notification.userInfo as! [String : AnyObject]
+            var keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
             var keyboardFrame = keyboardFrameValue.CGRectValue()
             lastKeyboardFrame = self.superview!.convertRect(keyboardFrame, fromView: UIApplication.sharedApplication().keyWindow)
-            //            println(keyboardFrame)
+            if SYKeyboardTextFieldDebugMode {
+                println("keyboardFrame : \(keyboardFrame)")
+            }
+
             
             //只有iOS 7 需要 这样获取 options   iOS 8 已经默认包含动画
-            var options = UIViewAnimationOptions((userInfo[UIKeyboardAnimationCurveUserInfoKey] as UInt) << 16)
+            var options = UIViewAnimationOptions((userInfo[UIKeyboardAnimationCurveUserInfoKey] as! UInt) << 16)
             
             UIView.animateWithDuration(keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
                 self.top = self.lastKeyboardFrame.origin.y - self.keyboardView.height
@@ -406,7 +430,7 @@ extension SYKeyboardTextField {
 extension SYKeyboardTextField {
 
     private var tapButtonTag : Int { return 12345 }
-    private var tapButton : UIButton { return self.superview!.viewWithTag(tapButtonTag) as UIButton }
+    private var tapButton : UIButton { return self.superview!.viewWithTag(tapButtonTag) as! UIButton }
     
     @objc private func tapAction(button : UIButton) {
         self.hide()
@@ -447,11 +471,11 @@ extension SYKeyboardTextField : UITextViewDelegate {
     
     func textViewDidChange(textView: UITextView) {
         
-        if (countElements(textView.text) == 0) {
-            placeholderLabel.hidden = false
+        if (count(textView.text) == 0) {
+            placeholderLabel.alpha = 1
         }
         else {
-            placeholderLabel.hidden = true
+            placeholderLabel.alpha = 0
         }
         
         self.delegate?.keyboardTextField?(self, didChangeText: self.textView.text)
@@ -485,6 +509,14 @@ extension SYKeyboardTextField : UITextViewDelegate {
     }
 }
 
+class SYKeyboardTextView : UITextView {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.contentOffset = CGPointMake(self.contentOffset.x, (self.contentSize.height + 2) - self.height)
+    }
+    
+}
+
 //MARK: UITextView extension
 extension UITextView {
 
@@ -494,6 +526,5 @@ extension UITextView {
         if line < 1.0 { return 1 }
         return abs(Int(line))
     }
-
 }
 
