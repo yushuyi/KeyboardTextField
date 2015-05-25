@@ -9,10 +9,10 @@ SYKeyboardTextField 是一个轻巧,简单,非侵入式的键盘附随输入框!
 # iOS Version
 iOS 7 以上
 
-# 安装
+# Install
 下载以后拖入项目即可
 
-# 初始化
+# Initialization
         keyboardTextField = SYKeyboardTextField(point: CGPointMake(0, 100));
         keyboardTextField.delegate = self
         keyboardTextField.leftButtonHidden = false
@@ -20,3 +20,4 @@ iOS 7 以上
         keyboardTextField.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin
         self.view.addSubview(keyboardTextField)
         keyboardTextField.toFullyBottom()
+# How to custom UI Style ?
