@@ -109,6 +109,7 @@ class SYKeyboardTextField: UIView {
         set {
             textView.text = newValue
             self.textViewDidChange(textView)
+            self.layoutIfNeeded()
         }
     }
     
@@ -213,54 +214,58 @@ class SYKeyboardTextField: UIView {
     }
     
   
-    var distance : CGFloat = 8.0
+    var leftRightDistance : CGFloat = 8.0
+    var middleDistance : CGFloat = 8.0
+    
+    var buttonMaxWidth : CGFloat = 65.0
+    var buttonMinWidth : CGFloat = 45.0
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         
         
-        var maxWidth : CGFloat = 65.0
-        var minWidth : CGFloat = 45.0
+
 
         if leftButtonHidden == false {
             var leftButtonWidth : CGFloat = 0.0
             self.leftButton.sizeToFit()
-            if (minWidth <= leftButton.width) {
+            if (buttonMinWidth <= leftButton.width) {
                 leftButtonWidth = leftButton.width + 10
             }else {
-                leftButtonWidth = minWidth
+                leftButtonWidth = buttonMinWidth
             }
-            if (leftButton.width > maxWidth)
+            if (leftButton.width > buttonMaxWidth)
             {
-                leftButtonWidth = maxWidth
+                leftButtonWidth = buttonMaxWidth
             }
-            leftButton.frame = CGRectMake(distance, 0, leftButtonWidth, textViewDefaultHeight);
+            leftButton.frame = CGRectMake(leftRightDistance, 0, leftButtonWidth, textViewDefaultHeight);
             leftButton.toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
         }
         
         if rightButtonHidden == false {
             var rightButtonWidth : CGFloat = 0.0
             self.rightButton.sizeToFit()
-            if (minWidth <= rightButton.width) {
+            if (buttonMinWidth <= rightButton.width) {
                 rightButtonWidth = rightButton.width + 10;
             }else {
-                rightButtonWidth = minWidth
+                rightButtonWidth = buttonMinWidth
             }
-            if (rightButton.width > maxWidth)
+            if (rightButton.width > buttonMaxWidth)
             {
-                rightButtonWidth = maxWidth;
+                rightButtonWidth = buttonMaxWidth;
             }
-            rightButton.frame = CGRectMake(keyboardView.width - distance - rightButtonWidth, 0, rightButtonWidth, textViewDefaultHeight);
+            rightButton.frame = CGRectMake(keyboardView.width - leftRightDistance - rightButtonWidth, 0, rightButtonWidth, textViewDefaultHeight);
             rightButton.toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
         }
         
         textView.frame =
             CGRectMake(
-                (leftButtonHidden == false ? leftButton.right:0) + distance,
+                (leftButtonHidden == false ? leftButton.right + middleDistance : leftRightDistance),
                 (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0 + 0.5,
                 keyboardView.width
-                    - (leftButtonHidden == false ? leftButton.width + distance:0)
-                    - (rightButtonHidden == false ? rightButton.width + distance:0)
-                    - distance * 2,
+                    - (leftButtonHidden == false ? leftButton.width + middleDistance:0)
+                    - (rightButtonHidden == false ? rightButton.width + middleDistance:0)
+                    - leftRightDistance * 2,
                 textViewCurrentHeightForLines(self.textView.numberOfLines())
         )
         textViewBackground.frame = textView.frame;
