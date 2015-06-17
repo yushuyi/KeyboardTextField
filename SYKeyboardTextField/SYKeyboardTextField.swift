@@ -83,6 +83,15 @@ class SYKeyboardTextField: UIView {
     
     private var hideing = false
     var sending = false
+    
+    var enabled: Bool = true
+    {
+        didSet {
+            textView.editable = enabled
+            leftButton.enabled = enabled
+            rightButton.enabled = enabled
+        }
+    }
     var editing : Bool
     {
         return textView.isFirstResponder()
@@ -118,7 +127,7 @@ class SYKeyboardTextField: UIView {
     var maxNumberOfLines : Int = 4
     
     
-    
+    //UI
     lazy var keyboardView = UIView()
     lazy var textView = SYKeyboardTextView()
     lazy var placeholderLabel = UILabel()
