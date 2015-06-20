@@ -140,10 +140,8 @@ class SYKeyboardTextField: UIView {
     
     weak var delegate : SYKeyboardTextFieldDelegate?
     
-    //便利初始化方法 通过关键字 convenience 然后 再通过 self.xxx 指向 指定构造函数
-    convenience init(point : CGPoint) {
-        
-        self.init(frame: CGRectMake(point.x, point.y, UIScreen.mainScreen().bounds.width, keyboardViewDefaultHeight))
+    override init(frame : CGRect) {
+        super.init(frame : frame)
         self.backgroundColor = UIColor.redColor()
         
         keyboardView.frame = self.bounds
@@ -154,14 +152,14 @@ class SYKeyboardTextField: UIView {
         keyboardView.addSubview(textViewBackground)
         
         textView.font = UIFont.systemFontOfSize(15.0);
-//        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
+        //        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
         textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, -1, 0, 1);//滚动指示器 皮条
         textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
         
         textView.keyboardType = UIKeyboardType.Default;
         textView.returnKeyType = UIReturnKeyType.Done;
         textView.enablesReturnKeyAutomatically = true;
- 
+        
         textView.delegate = self
         textView.textColor = UIColor(white: 0.200, alpha: 1.000)
         textView.backgroundColor = UIColor.greenColor()
@@ -190,10 +188,17 @@ class SYKeyboardTextField: UIView {
         rightButton.addTarget(self, action: Selector("rightButtonAction:"), forControlEvents: UIControlEvents.TouchUpInside)
         keyboardView.addSubview(rightButton)
         
-        
-
         self.registeringKeyboardNotification()
         
+    }
+    
+    //便利初始化方法 通过关键字 convenience 然后 再通过 self.xxx 指向 指定构造函数
+    convenience init(point : CGPoint) {
+        self.init(frame: CGRectMake(point.x, point.y, UIScreen.mainScreen().bounds.width, keyboardViewDefaultHeight))
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
     }
 
     
