@@ -15,11 +15,11 @@ class ViewController: UIViewController {
     
     override func loadView() {
         super.loadView()
-        keyboardTextField = SYKeyboardTextField(point: CGPointMake(0, 100));
+        keyboardTextField = SYKeyboardTextField(point: CGPointMake(0, 0), width: self.view.width)
         keyboardTextField.delegate = self
         keyboardTextField.leftButtonHidden = false
         keyboardTextField.rightButtonHidden = false
-        keyboardTextField.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin
+        keyboardTextField.autoresizingMask = [UIViewAutoresizing.FlexibleWidth , UIViewAutoresizing.FlexibleTopMargin]
         self.view.addSubview(keyboardTextField)
         keyboardTextField.toFullyBottom()
     }

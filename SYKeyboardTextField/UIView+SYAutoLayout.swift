@@ -1,9 +1,9 @@
 //
-//  UIView+SYAutoLayout.swift
+//  UIView+Frame.swift
 //  DoudouApp
 //
-//  Created by yushuyi on 14/12/11.
-//  Copyright (c) 2014年 DoudouApp. All rights reserved.
+//  Created by yushuyi on 15/5/24.
+//  Copyright (c) 2015年 DoudouApp. All rights reserved.
 //
 
 import Foundation
@@ -17,57 +17,43 @@ public enum SYLayoutAlignCenter : Int {
     case XY
 }
 
-
-public extension UIView {
-
-    func constraintHeight(constant : CGFloat){
-        let constraints = self.constraints()
-        for var i = 0 ; i < self.constraints().count ; i++ {
-            var constraint = self.constraints()[i] as! NSLayoutConstraint
-            if constraint.firstAttribute == NSLayoutAttribute.Height {
-               constraint.constant = constant
-               break
-            }
-            
-        }
-    }
+extension UIView {
     
-    func constraintCenterX(constant : CGFloat){
-        let constraints = self.constraints()
-        for var i = 0 ; i < self.constraints().count ; i++ {
-            var constraint = self.constraints()[i] as! NSLayoutConstraint
-            if constraint.firstAttribute == NSLayoutAttribute.CenterX {
-                constraint.constant = constant
-                break
-            }
-        }
-    }
-    
-    func constraintCenterY(constant : CGFloat){
-        let constraints = self.constraints()
-        for var i = 0 ; i < self.constraints().count ; i++ {
-            var constraint = self.constraints()[i] as! NSLayoutConstraint
-            if constraint.firstAttribute == NSLayoutAttribute.CenterY {
-                constraint.constant = constant
-                break
-            }
-        }
-    }
-    
-    
-    func toBottom (offset : CGFloat = 0.0) {
+    //MARK: toBottom
+    func toBottom (offsetScale  offsetScale : CGFloat) {
         if let superView = self.superview {
-           self.bottom = superView.height - offset
+            self.bottom = superView.height - (superView.height * offsetScale)
         }else {
-            println("UIView+SYAutoLayout toBottom 没有 superview");
+            print("UIView+SYAutoLayout toBottom 没有 superview");
+        }
+    }
+    /**
+    将视图移动到父视图的底端
+    
+    - parameter offset: 可进行微调 大于0 则  小于0 则
+    */
+    func toBottom(offset offset : CGFloat = 0.0) {
+        if let superView = self.superview {
+            self.bottom = superView.height - offset
+        }else {
+            print("UIView+SYAutoLayout toBottom 没有 superview");
         }
     }
     
     func toFullyBottom() {
         self.toBottom()
-        self.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleWidth
+        self.autoresizingMask = [UIViewAutoresizing.FlexibleTopMargin, UIViewAutoresizing.FlexibleWidth]
     }
-
+    
+    //MARK: toRight
+    
+    func toRight(offset : CGFloat = 0.0) {
+        if let superView = self.superview {
+            self.right = superView.width - offset
+        }else {
+            print("UIView+SYAutoLayout toRight 没有 superview");
+        }
+    }
     
     
     public var size: CGSize {
@@ -157,7 +143,7 @@ public extension UIView {
     func alignCenter (alignCenter : SYLayoutAlignCenter) {
         
         assert(self.superview != nil, "SYAutoLayoutTips:this view not have supview")
-
+        
         if let superview = self.superview {
             
             if (alignCenter == SYLayoutAlignCenter.Y || alignCenter == SYLayoutAlignCenter.UpDown) {
@@ -172,4 +158,5 @@ public extension UIView {
         }
         
     }
+    
 }

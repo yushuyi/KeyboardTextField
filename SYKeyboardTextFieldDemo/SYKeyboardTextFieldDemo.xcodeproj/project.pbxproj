@@ -12,20 +12,9 @@
 		22918F661A79C48200547672 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22918F641A79C48200547672 /* Main.storyboard */; };
 		22918F681A79C48200547672 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22918F671A79C48200547672 /* Images.xcassets */; };
 		22918F6B1A79C48200547672 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22918F691A79C48200547672 /* LaunchScreen.xib */; };
-		22918F771A79C48300547672 /* SYKeyboardTextFieldDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22918F761A79C48300547672 /* SYKeyboardTextFieldDemoTests.swift */; };
 		22918F821A79C7EA00547672 /* SYKeyboardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22918F811A79C7EA00547672 /* SYKeyboardTextField.swift */; };
 		22918F841A79C81E00547672 /* UIView+SYAutoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22918F831A79C81E00547672 /* UIView+SYAutoLayout.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		22918F711A79C48300547672 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 22918F531A79C48200547672 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 22918F5A1A79C48200547672;
-			remoteInfo = SYKeyboardTextFieldDemo;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		22918F5B1A79C48200547672 /* SYKeyboardTextFieldDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SYKeyboardTextFieldDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -35,7 +24,6 @@
 		22918F651A79C48200547672 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		22918F671A79C48200547672 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22918F6A1A79C48200547672 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		22918F701A79C48300547672 /* SYKeyboardTextFieldDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SYKeyboardTextFieldDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22918F751A79C48300547672 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22918F761A79C48300547672 /* SYKeyboardTextFieldDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SYKeyboardTextFieldDemoTests.swift; sourceTree = "<group>"; };
 		22918F811A79C7EA00547672 /* SYKeyboardTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SYKeyboardTextField.swift; sourceTree = "<group>"; };
@@ -44,13 +32,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		22918F581A79C48200547672 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		22918F6D1A79C48300547672 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -74,7 +55,6 @@
 			isa = PBXGroup;
 			children = (
 				22918F5B1A79C48200547672 /* SYKeyboardTextFieldDemo.app */,
-				22918F701A79C48300547672 /* SYKeyboardTextFieldDemoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -147,39 +127,18 @@
 			productReference = 22918F5B1A79C48200547672 /* SYKeyboardTextFieldDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		22918F6F1A79C48300547672 /* SYKeyboardTextFieldDemoTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 22918F7D1A79C48300547672 /* Build configuration list for PBXNativeTarget "SYKeyboardTextFieldDemoTests" */;
-			buildPhases = (
-				22918F6C1A79C48300547672 /* Sources */,
-				22918F6D1A79C48300547672 /* Frameworks */,
-				22918F6E1A79C48300547672 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				22918F721A79C48300547672 /* PBXTargetDependency */,
-			);
-			name = SYKeyboardTextFieldDemoTests;
-			productName = SYKeyboardTextFieldDemoTests;
-			productReference = 22918F701A79C48300547672 /* SYKeyboardTextFieldDemoTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		22918F531A79C48200547672 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = yushuyi;
 				TargetAttributes = {
 					22918F5A1A79C48200547672 = {
 						CreatedOnToolsVersion = 6.1.1;
-					};
-					22918F6F1A79C48300547672 = {
-						CreatedOnToolsVersion = 6.1.1;
-						TestTargetID = 22918F5A1A79C48200547672;
 					};
 				};
 			};
@@ -197,7 +156,6 @@
 			projectRoot = "";
 			targets = (
 				22918F5A1A79C48200547672 /* SYKeyboardTextFieldDemo */,
-				22918F6F1A79C48300547672 /* SYKeyboardTextFieldDemoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -210,13 +168,6 @@
 				22918F661A79C48200547672 /* Main.storyboard in Resources */,
 				22918F6B1A79C48200547672 /* LaunchScreen.xib in Resources */,
 				22918F681A79C48200547672 /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		22918F6E1A79C48300547672 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,23 +185,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22918F6C1A79C48300547672 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22918F771A79C48300547672 /* SYKeyboardTextFieldDemoTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		22918F721A79C48300547672 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 22918F5A1A79C48200547672 /* SYKeyboardTextFieldDemo */;
-			targetProxy = 22918F711A79C48300547672 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		22918F641A79C48200547672 /* Main.storyboard */ = {
@@ -292,6 +227,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -355,6 +291,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SYKeyboardTextFieldDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yushuyi.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -365,41 +302,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SYKeyboardTextFieldDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yushuyi.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		22918F7E1A79C48300547672 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = SYKeyboardTextFieldDemoTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYKeyboardTextFieldDemo.app/SYKeyboardTextFieldDemo";
-			};
-			name = Debug;
-		};
-		22918F7F1A79C48300547672 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = SYKeyboardTextFieldDemoTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYKeyboardTextFieldDemo.app/SYKeyboardTextFieldDemo";
 			};
 			name = Release;
 		};
@@ -420,15 +324,6 @@
 			buildConfigurations = (
 				22918F7B1A79C48300547672 /* Debug */,
 				22918F7C1A79C48300547672 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		22918F7D1A79C48300547672 /* Build configuration list for PBXNativeTarget "SYKeyboardTextFieldDemoTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				22918F7E1A79C48300547672 /* Debug */,
-				22918F7F1A79C48300547672 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
