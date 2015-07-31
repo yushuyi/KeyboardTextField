@@ -34,7 +34,7 @@ SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying
         
 ## Author
 
-(@余书懿)[http://weibo.com/ysy441088327]
+[@余书懿](http://weibo.com/ysy441088327)
 
 ## License
 
