@@ -13,7 +13,6 @@ SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying
 
 - Insert `github "441088327/SYKeyboardTextField"` to your Cartfile.
 - Run `carthage update`.
-- 
 
 
 ## Usage
