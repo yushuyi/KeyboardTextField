@@ -13,7 +13,7 @@ private var SYKeyboardTextFieldDebugMode : Bool = false
 
 
 
-@objc protocol SYKeyboardTextFieldDelegate : NSObjectProtocol {
+@objc protocol SYKeyboardTextFieldDelegate : class {
 
     //    /**
     //    *  键盘被主动要求取消使用时触发
@@ -73,7 +73,7 @@ private var SYKeyboardTextFieldDebugMode : Bool = false
 }
 
 
-private let keyboardViewDefaultHeight : CGFloat = 48.0
+private var keyboardViewDefaultHeight : CGFloat = 48.0
 private let textViewDefaultHeight : CGFloat = 36.0
 
 
@@ -142,6 +142,7 @@ class SYKeyboardTextField: UIView {
     
     override init(frame : CGRect) {
         super.init(frame : frame)
+        keyboardViewDefaultHeight = frame.height
         self.backgroundColor = UIColor.redColor()
         
         keyboardView.frame = self.bounds
