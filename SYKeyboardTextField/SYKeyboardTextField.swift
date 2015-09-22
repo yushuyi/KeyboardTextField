@@ -340,17 +340,16 @@ extension SYKeyboardTextField {
     }
     
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        if let object = object where object.isEqual(self.textView) && keyPath == "contentSize" {
-            if let change = change {
+        
+        guard let object = object,let change = change else { return }
+        
+        if object.isEqual(self.textView) && keyPath == "contentSize" {
+            if SYKeyboardTextFieldDebugMode {
                 let newValue = change[NSKeyValueChangeNewKey]?.CGSizeValue()
-                if SYKeyboardTextFieldDebugMode {
-                    print("\(newValue)---\(self.appropriateInputbarHeight())")
-                }
+                print("\(newValue)---\(self.appropriateInputbarHeight())")
             }
             
-            
             let newKeyboardHeight = self.appropriateInputbarHeight()
-            
             if newKeyboardHeight != keyboardView.height && self.superview != nil {
                 UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                     let lastKeyboardFrameHeight = (self.lastKeyboardFrame.origin.y == 0.0 ? self.superview!.height : self.lastKeyboardFrame.origin.y)
@@ -531,9 +530,22 @@ extension SYKeyboardTextField : UITextViewDelegate {
 }
 
 class SYKeyboardTextView : UITextView {
+    var hasDragging : Bool = false
     override func layoutSubviews() {
         super.layoutSubviews()
-        self.contentOffset = CGPointMake(self.contentOffset.x, (self.contentSize.height + 2) - self.height)
+        if self.dragging == false {
+            if hasDragging {
+                let delayTime = dispatch_time(DISPATCH_TIME_NOW,Int64(1 * Double(NSEC_PER_SEC)))
+                dispatch_after(delayTime, dispatch_get_main_queue()) {
+                    self.hasDragging = true
+                }
+            }else {
+                self.contentOffset = CGPointMake(self.contentOffset.x, (self.contentSize.height + 2) - self.height)
+            }
+            
+        }else {
+            hasDragging = true
+        }
     }
     
 }
