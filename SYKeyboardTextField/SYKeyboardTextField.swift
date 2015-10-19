@@ -537,10 +537,12 @@ class SYKeyboardTextView : UITextView {
             if hasDragging {
                 let delayTime = dispatch_time(DISPATCH_TIME_NOW,Int64(1 * Double(NSEC_PER_SEC)))
                 dispatch_after(delayTime, dispatch_get_main_queue()) {
-                    self.hasDragging = true
+                    self.hasDragging = false
                 }
             }else {
-                self.contentOffset = CGPointMake(self.contentOffset.x, (self.contentSize.height + 2) - self.height)
+                if selectedRange.location == text.characters.count {
+                    self.contentOffset = CGPointMake(self.contentOffset.x, (self.contentSize.height + 2) - self.height)
+                }
             }
             
         }else {
