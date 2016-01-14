@@ -8,27 +8,8 @@
 
 import UIKit
 
+@objc public protocol SYKeyboardTextFieldDelegate : class {
 
-private var SYKeyboardTextFieldDebugMode : Bool = false
-
-
-
-@objc protocol SYKeyboardTextFieldDelegate : class {
-
-    //    /**
-    //    *  键盘被主动要求取消使用时触发
-    //    */
-    //    - (void)keyboardTextFieldDidCancel:(SYKeyboardTextField *)aSelf;
-    //didUpdateWholeHeight:(CGFloat)wholeHeight;
-    //    /**
-    //    *  输入了非法字符串
-    //    *
-    //    *  @param aSelf  self
-    //    *  @param string 本次输入的非法字符串
-    //    */
-    //    - (void)keyboardTextField:(SYKeyboardTextField *)aSelf didInputUnsupportedString:(NSString *)string;
-    
-    
     /**
     点击左边按钮的委托
     */
@@ -79,12 +60,12 @@ private let textViewDefaultHeight : CGFloat = 36.0
 
 
 
-class SYKeyboardTextField: UIView {
+public class SYKeyboardTextField: UIView {
     
     private var hideing = false
-    var sending = false
+    public var sending = false
     
-    var enabled: Bool = true
+    public var enabled: Bool = true
     {
         didSet {
             textView.editable = enabled
@@ -92,18 +73,18 @@ class SYKeyboardTextField: UIView {
             rightButton.enabled = enabled
         }
     }
-    var editing : Bool
+    public var editing : Bool
     {
         return textView.isFirstResponder()
     }
-    var leftButtonHidden : Bool = true {
+    public var leftButtonHidden : Bool = true {
         didSet
         {
             leftButton.hidden = leftButtonHidden
             self.setNeedsLayout()
         }
     }
-    var rightButtonHidden : Bool = true {
+    public var rightButtonHidden : Bool = true {
         didSet
         {
             rightButton.hidden = rightButtonHidden
@@ -111,7 +92,7 @@ class SYKeyboardTextField: UIView {
         }
     }
     
-    var text : String! {
+    public var text : String! {
         get {
             return textView.text
         }
@@ -122,25 +103,25 @@ class SYKeyboardTextField: UIView {
         }
     }
     
-    var maxNumberOfWords : Int = 140
-    var minNumberOfWords : Int = 0
-    var maxNumberOfLines : Int = 4
+    public var maxNumberOfWords : Int = 140
+    public var minNumberOfWords : Int = 0
+    public var maxNumberOfLines : Int = 4
     
     
     //UI
-    lazy var keyboardView = UIView()
-    lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
-    lazy var placeholderLabel = UILabel()
-    lazy var textViewBackground = UIImageView()
-    lazy var leftButton = UIButton()
-    lazy var rightButton = UIButton()
+    public lazy var keyboardView = UIView()
+    public lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
+    public lazy var placeholderLabel = UILabel()
+    public lazy var textViewBackground = UIImageView()
+    public lazy var leftButton = UIButton()
+    public lazy var rightButton = UIButton()
     
     
     private var lastKeyboardFrame : CGRect = CGRectZero
     
-    weak var delegate : SYKeyboardTextFieldDelegate?
+    public weak var delegate : SYKeyboardTextFieldDelegate?
     
-    override init(frame : CGRect) {
+    public override init(frame : CGRect) {
         super.init(frame : frame)
         keyboardViewDefaultHeight = frame.height
         self.backgroundColor = UIColor.redColor()
@@ -194,25 +175,23 @@ class SYKeyboardTextField: UIView {
     }
     
     //便利初始化方法 通过关键字 convenience 然后 再通过 self.xxx 指向 指定构造函数
-    convenience init(point : CGPoint,width : CGFloat) {
+    public convenience init(point : CGPoint,width : CGFloat) {
         self.init(frame: CGRectMake(point.x, point.y, width, keyboardViewDefaultHeight))
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
 
-    
-    
-    func show () {
+    public func show () {
         self.textView.becomeFirstResponder()
     }
     
-    func hide () {
+    public func hide () {
         self.textView.resignFirstResponder()
         self.endEditing(true)
     }
-    func clearTestColor() {
+    public func clearTestColor() {
         self.backgroundColor = UIColor.clearColor()
         leftButton.backgroundColor = UIColor.clearColor()
         rightButton.backgroundColor = UIColor.clearColor()
@@ -220,26 +199,23 @@ class SYKeyboardTextField: UIView {
         textViewBackground.backgroundColor = UIColor.clearColor()
     }
     
-    @objc private func leftButtonAction(button : UIButton) {
+    func leftButtonAction(button : UIButton) {
         self.delegate?.keyboardTextFieldPressLeftButton?(self)
     }
     
-    @objc private func rightButtonAction(button : UIButton) {
+    func rightButtonAction(button : UIButton) {
         self.delegate?.keyboardTextFieldPressRightButton?(self)
     }
     
   
-    var leftRightDistance : CGFloat = 8.0
-    var middleDistance : CGFloat = 8.0
+    public var leftRightDistance : CGFloat = 8.0
+    public var middleDistance : CGFloat = 8.0
     
-    var buttonMaxWidth : CGFloat = 65.0
-    var buttonMinWidth : CGFloat = 45.0
+    public var buttonMaxWidth : CGFloat = 65.0
+    public var buttonMinWidth : CGFloat = 45.0
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
-        
-        
-
 
         if leftButtonHidden == false {
             var leftButtonWidth : CGFloat = 0.0
@@ -339,7 +315,7 @@ extension SYKeyboardTextField {
         return CGFloat(roundf(Float(height)));
     }
     
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         
         guard let object = object,let change = change else { return }
         
@@ -362,8 +338,7 @@ extension SYKeyboardTextField {
     
 }
 
-//MARK: Keyboard Notification 
-
+//MARK: Keyboard Notification
 extension SYKeyboardTextField {
     
     var keyboardAnimationOptions : UIViewAnimationOptions {
@@ -373,7 +348,7 @@ extension SYKeyboardTextField {
         return  NSTimeInterval(0.25)
     }
     
-    private func registeringKeyboardNotification() {
+    func registeringKeyboardNotification() {
         //  Registering for keyboard notification.
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:",name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardDidShow:",name: UIKeyboardDidShowNotification, object: nil)
@@ -389,29 +364,29 @@ extension SYKeyboardTextField {
     
     }
     
-    @objc private func keyboardWillShow(notification : NSNotification) {
+    func keyboardWillShow(notification : NSNotification) {
         if textView.isFirstResponder() {
             self.delegate?.keyboardTextFieldWillShow?(self)
         }
     }
-    @objc private func keyboardDidShow(notification : NSNotification) {
+    func keyboardDidShow(notification : NSNotification) {
         if textView.isFirstResponder() {
             self.delegate?.keyboardTextFieldDidShow?(self)
         }
     }
-    @objc private func keyboardWillHide(notification : NSNotification) {
+    func keyboardWillHide(notification : NSNotification) {
         if textView.isFirstResponder() {
             hideing = true
             self.delegate?.keyboardTextFieldWillHide?(self)
         }
     }
-    @objc private func keyboardDidHide(notification : NSNotification) {
+    func keyboardDidHide(notification : NSNotification) {
         if hideing {
             hideing = false
             self.delegate?.keyboardTextFieldDidHide?(self)
         }
     }
-    @objc private func keyboardWillChangeFrame(notification : NSNotification) {
+    func keyboardWillChangeFrame(notification : NSNotification) {
         if self.window == nil { return }
         if !self.window!.keyWindow { return }
         
@@ -423,10 +398,6 @@ extension SYKeyboardTextField {
             if SYKeyboardTextFieldDebugMode {
                 print("keyboardFrame : \(keyboardFrame)")
             }
-
-            
-            //只有iOS 7 需要 这样获取 options   iOS 8 已经默认包含动画
-//            var options = UIViewAnimationOptions(rawValue: (userInfo[UIKeyboardAnimationCurveUserInfoKey] as! UInt) << 16)
             
             UIView.animateWithDuration(keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
                 self.top = self.lastKeyboardFrame.origin.y - self.keyboardView.height
@@ -435,13 +406,8 @@ extension SYKeyboardTextField {
         }
     }
     
-    
-    @objc private func keyboardDidChangeFrame(notification : NSNotification) {}
-    
-    
-    @objc private func willChangeStatusBarOrientation(notification : NSNotification) {
-        
-    }
+    func keyboardDidChangeFrame(notification : NSNotification) {}
+    func willChangeStatusBarOrientation(notification : NSNotification) {}
 
 }
 
@@ -451,8 +417,7 @@ extension SYKeyboardTextField {
 
     private var tapButtonTag : Int { return 12345 }
     private var tapButton : UIButton { return self.superview!.viewWithTag(tapButtonTag) as! UIButton }
-    
-    @objc private func tapAction(button : UIButton) {
+    func tapAction(button : UIButton) {
         self.hide()
     }
     
@@ -465,7 +430,7 @@ extension SYKeyboardTextField {
         }
     }
     
-    override func didMoveToSuperview() {
+    override public func didMoveToSuperview() {
         if let superview = self.superview {
             let tapButton = UIButton(frame: superview.bounds)
             tapButton.addTarget(self, action: "tapAction:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -477,7 +442,7 @@ extension SYKeyboardTextField {
         }
     }
     
-    override func willMoveToSuperview(newSuperview: UIView?) {
+    override public func willMoveToSuperview(newSuperview: UIView?) {
         if ((self.superview != nil) && newSuperview == nil) {
             self.superview?.viewWithTag(tapButtonTag)?.removeFromSuperview()
             textView.removeObserver(self, forKeyPath: "contentSize", context: nil)
@@ -489,9 +454,9 @@ extension SYKeyboardTextField {
 //MARK: UITextViewDelegate
 extension SYKeyboardTextField : UITextViewDelegate {
     
-    func textViewDidChange(textView: UITextView) {
+    public func textViewDidChange(textView: UITextView) {
         
-        if (textView.text.characters.count == 0) {
+        if (textView.text.characters.isEmpty) {
             placeholderLabel.alpha = 1
         }
         else {
@@ -501,23 +466,23 @@ extension SYKeyboardTextField : UITextViewDelegate {
         self.delegate?.keyboardTextField?(self, didChangeText: self.textView.text)
     }
     
-    func textViewDidBeginEditing(textView: UITextView) {
+    public func textViewDidBeginEditing(textView: UITextView) {
         self.setTapButtonHidden(false)
     }
     
-    func textViewDidEndEditing(textView: UITextView) {
+    public func textViewDidEndEditing(textView: UITextView) {
         self.setTapButtonHidden(true)
     }
     
-    func textViewShouldBeginEditing(textView: UITextView) -> Bool {
+    public func textViewShouldBeginEditing(textView: UITextView) -> Bool {
         return true
     }
 
-    func textViewShouldEndEditing(textView: UITextView) -> Bool {
+    public func textViewShouldEndEditing(textView: UITextView) -> Bool {
         return true
     }
     
-    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+    public func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
         if sending { return false }
         if text == "\n" {
             if sending == false {
@@ -529,9 +494,9 @@ extension SYKeyboardTextField : UITextViewDelegate {
     }
 }
 
-class SYKeyboardTextView : UITextView {
-    var hasDragging : Bool = false
-    override func layoutSubviews() {
+public class SYKeyboardTextView : UITextView {
+    private var hasDragging : Bool = false
+    override public func layoutSubviews() {
         super.layoutSubviews()
         if self.dragging == false {
             if hasDragging {
@@ -551,6 +516,7 @@ class SYKeyboardTextView : UITextView {
     }
     
 }
+private var SYKeyboardTextFieldDebugMode : Bool = false
 
 //MARK: UITextView extension
 extension UITextView {
@@ -562,4 +528,3 @@ extension UITextView {
         return abs(Int(line))
     }
 }
-
