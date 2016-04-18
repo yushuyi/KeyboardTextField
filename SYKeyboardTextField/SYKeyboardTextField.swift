@@ -161,13 +161,13 @@ public class SYKeyboardTextField: UIView {
         leftButton.backgroundColor = UIColor.redColor()
         leftButton.titleLabel?.font = UIFont.systemFontOfSize(14.0)
         leftButton.setTitle("Left", forState: UIControlState.Normal)
-        leftButton.addTarget(self, action: Selector("leftButtonAction:"), forControlEvents: UIControlEvents.TouchUpInside)
+        leftButton.addTarget(self, action: #selector(SYKeyboardTextField.leftButtonAction(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         keyboardView.addSubview(leftButton)
         
         rightButton.backgroundColor = UIColor.redColor()
         rightButton.titleLabel?.font = UIFont.systemFontOfSize(14.0)
         rightButton.setTitle("Right", forState: UIControlState.Normal)
-        rightButton.addTarget(self, action: Selector("rightButtonAction:"), forControlEvents: UIControlEvents.TouchUpInside)
+        rightButton.addTarget(self, action: #selector(SYKeyboardTextField.rightButtonAction(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         keyboardView.addSubview(rightButton)
         
         self.registeringKeyboardNotification()
@@ -350,17 +350,17 @@ extension SYKeyboardTextField {
     
     func registeringKeyboardNotification() {
         //  Registering for keyboard notification.
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:",name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardDidShow:",name: UIKeyboardDidShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillShow(_:)),name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidShow(_:)),name: UIKeyboardDidShowNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:",name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardDidHide:",name: UIKeyboardDidHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillHide(_:)),name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidHide(_:)),name: UIKeyboardDidHideNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillChangeFrame:",name:UIKeyboardWillChangeFrameNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardDidChangeFrame:",name:UIKeyboardDidChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillChangeFrame(_:)),name:UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidChangeFrame(_:)),name:UIKeyboardDidChangeFrameNotification, object: nil)
         
         //  Registering for orientation changes notification
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "willChangeStatusBarOrientation:",name: UIApplicationWillChangeStatusBarOrientationNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.willChangeStatusBarOrientation(_:)),name: UIApplicationWillChangeStatusBarOrientationNotification, object: nil)
     
     }
     
@@ -433,7 +433,7 @@ extension SYKeyboardTextField {
     override public func didMoveToSuperview() {
         if let superview = self.superview {
             let tapButton = UIButton(frame: superview.bounds)
-            tapButton.addTarget(self, action: "tapAction:", forControlEvents: UIControlEvents.TouchUpInside)
+            tapButton.addTarget(self, action: #selector(SYKeyboardTextField.tapAction(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             tapButton.tag = tapButtonTag
             tapButton.hidden = true
             tapButton.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
