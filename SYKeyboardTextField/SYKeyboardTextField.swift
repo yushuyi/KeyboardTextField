@@ -149,6 +149,7 @@ public class SYKeyboardTextField: UIView {
         textView.scrollsToTop = false
         keyboardView.addSubview(textView)
         
+        placeholderLabel.textAlignment = NSTextAlignment.Left
         placeholderLabel.numberOfLines = 1
         placeholderLabel.backgroundColor = UIColor.clearColor()
         placeholderLabel.textColor = UIColor.lightGrayColor()
