@@ -137,7 +137,7 @@ public class SYKeyboardTextField: UIView {
         //        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
         textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, -1, 0, 1);//滚动指示器 皮条
         textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
-        
+        textView.autocorrectionType = .No
         textView.keyboardType = UIKeyboardType.Default;
         textView.returnKeyType = UIReturnKeyType.Done;
         textView.enablesReturnKeyAutomatically = true;
