@@ -1,7 +1,7 @@
 //
 //  SYKeyboardTextField.swift
 //  DoudouApp
-//
+//  Version 2.0 iOS 8.0 and Swift 3 and Xcode8 GM Seed
 //  Created by yushuyi on 15/1/17.
 //  Copyright (c) 2015年 DoudouApp. All rights reserved.
 //
@@ -13,299 +13,289 @@ import UIKit
     /**
     点击左边按钮的委托
     */
-    optional func keyboardTextFieldPressLeftButton(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldPressLeftButton(_ keyboardTextField :SYKeyboardTextField)
    
     /**
     点击右边按钮的委托
     */
-    optional func keyboardTextFieldPressRightButton(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldPressRightButton(_ keyboardTextField :SYKeyboardTextField)
 
     /**
     点击键盘上面的回车按钮响应委托
     */
-    optional func keyboardTextFieldPressReturnButton(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldPressReturnButton(_ keyboardTextField :SYKeyboardTextField)
 
     /**
     键盘将要隐藏时响应的委托
     */
-    optional func keyboardTextFieldWillHide(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldWillHide(_ keyboardTextField :SYKeyboardTextField)
 
     /**
     键盘已经隐藏时响应的委托
     */
-    optional func keyboardTextFieldDidHide(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldDidHide(_ keyboardTextField :SYKeyboardTextField)
 
     /**
     键盘将要显示时响应的委托
     */
-    optional func keyboardTextFieldWillShow(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldWillShow(_ keyboardTextField :SYKeyboardTextField)
 
     /**
     键盘已经显示时响应的委托
     */
-    optional func keyboardTextFieldDidShow(keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldDidShow(_ keyboardTextField :SYKeyboardTextField)
     
     /**
     键盘文本内容被改变时触发
     - parameter text:              本次写入的值
     */
-    optional func keyboardTextField(keyboardTextField :SYKeyboardTextField , didChangeText text:String)
+    @objc optional func keyboardTextField(_ keyboardTextField :SYKeyboardTextField , didChangeText text:String)
 
 }
 
+fileprivate var SYKeyboardTextFieldDebugMode : Bool = false
 
-private var keyboardViewDefaultHeight : CGFloat = 48.0
-private let textViewDefaultHeight : CGFloat = 36.0
+fileprivate var keyboardViewDefaultHeight : CGFloat = 48.0
+fileprivate let textViewDefaultHeight : CGFloat = 36.0
 
 
 
 
-public class SYKeyboardTextField: UIView {
+open class SYKeyboardTextField: UIView {
+
+    //Delegate
+    open weak var delegate : SYKeyboardTextFieldDelegate?
     
-    private var hideing = false
-    public var sending = false
+    //Init
+    public convenience init(point : CGPoint,width : CGFloat) {
+        self.init(frame: CGRect(x: point.x, y: point.y, width: width, height: keyboardViewDefaultHeight))
+    }
     
-    public var enabled: Bool = true
-    {
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    public override init(frame : CGRect) {
+        super.init(frame : frame)
+        keyboardViewDefaultHeight = frame.height
+        backgroundColor = UIColor.red
+        
+        keyboardView.frame = bounds
+        keyboardView.backgroundColor = UIColor.yellow
+        keyboardView.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
+        addSubview(keyboardView)
+        
+        keyboardView.addSubview(textViewBackground)
+        
+        textView.font = UIFont.systemFont(ofSize: 15.0);
+        //        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
+        textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, -1, 0, 1);//滚动指示器 皮条
+        textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
+        textView.autocorrectionType = .no
+        textView.keyboardType = UIKeyboardType.default;
+        textView.returnKeyType = UIReturnKeyType.done;
+        textView.enablesReturnKeyAutomatically = true;
+        
+        textView.delegate = self
+        textView.textColor = UIColor(white: 0.200, alpha: 1.000)
+        textView.backgroundColor = UIColor.green
+        textView.addObserver(self, forKeyPath: "contentSize", options: NSKeyValueObservingOptions.new, context: nil)
+        textView.scrollsToTop = false
+        keyboardView.addSubview(textView)
+        
+        placeholderLabel.textAlignment = NSTextAlignment.left
+        placeholderLabel.numberOfLines = 1
+        placeholderLabel.backgroundColor = UIColor.clear
+        placeholderLabel.textColor = UIColor.lightGray
+        placeholderLabel.font = textView.font;
+        placeholderLabel.isHidden = false
+        placeholderLabel.text = "placeholder"
+        textView.addSubview(placeholderLabel)
+        
+        
+        leftButton.backgroundColor = UIColor.red
+        leftButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
+        leftButton.setTitle("Left", for: UIControlState())
+        leftButton.addTarget(self, action: #selector(SYKeyboardTextField.leftButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        keyboardView.addSubview(leftButton)
+        
+        rightButton.backgroundColor = UIColor.red
+        rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
+        rightButton.setTitle("Right", for: UIControlState())
+        rightButton.addTarget(self, action: #selector(SYKeyboardTextField.rightButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        keyboardView.addSubview(rightButton)
+        
+        registeringKeyboardNotification()
+        
+    }
+
+    open func show() {
+        textView.becomeFirstResponder()
+    }
+    
+    open func hide() {
+        textView.resignFirstResponder()
+        endEditing(true)
+    }
+    
+    //Status
+    public var isSending = false
+    
+    public var isEnabled: Bool = true {
         didSet {
-            textView.editable = enabled
-            leftButton.enabled = enabled
-            rightButton.enabled = enabled
-        }
-    }
-    public var editing : Bool
-    {
-        return textView.isFirstResponder()
-    }
-    public var leftButtonHidden : Bool = true {
-        didSet
-        {
-            leftButton.hidden = leftButtonHidden
-            self.setNeedsLayout()
-        }
-    }
-    public var rightButtonHidden : Bool = true {
-        didSet
-        {
-            rightButton.hidden = rightButtonHidden
-            self.setNeedsLayout()
+            textView.isEditable = isEnabled
+            leftButton.isEnabled = isEnabled
+            rightButton.isEnabled = isEnabled
         }
     }
     
+    public var isEditing : Bool {
+        return textView.isFirstResponder
+    }
+    
+    public var isLeftButtonHidden : Bool = true {
+        didSet {
+            leftButton.isHidden = isLeftButtonHidden
+            setNeedsLayout()
+        }
+    }
+    
+    public var isRightButtonHidden : Bool = true {
+        didSet {
+            rightButton.isHidden = isRightButtonHidden
+            setNeedsLayout()
+        }
+    }
+    
+    //text
     public var text : String! {
         get {
             return textView.text
         }
         set {
             textView.text = newValue
-            self.textViewDidChange(textView)
-            self.layoutIfNeeded()
+            textViewDidChange(textView)
+            layoutIfNeeded()
         }
     }
     
-    public var maxNumberOfWords : Int = 140
-    public var minNumberOfWords : Int = 0
-    public var maxNumberOfLines : Int = 4
+    open var maxNumberOfWords : Int = 140
+    open var minNumberOfWords : Int = 0
+    open var maxNumberOfLines : Int = 4
     
     
     //UI
-    public lazy var keyboardView = UIView()
-    public lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
-    public lazy var placeholderLabel = UILabel()
-    public lazy var textViewBackground = UIImageView()
-    public lazy var leftButton = UIButton()
-    public lazy var rightButton = UIButton()
-    
-    
-    private var lastKeyboardFrame : CGRect = CGRectZero
-    
-    public weak var delegate : SYKeyboardTextFieldDelegate?
-    
-    public override init(frame : CGRect) {
-        super.init(frame : frame)
-        keyboardViewDefaultHeight = frame.height
-        self.backgroundColor = UIColor.redColor()
-        
-        keyboardView.frame = self.bounds
-        keyboardView.backgroundColor = UIColor.yellowColor()
-        keyboardView.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
-        self.addSubview(keyboardView)
-        
-        keyboardView.addSubview(textViewBackground)
-        
-        textView.font = UIFont.systemFontOfSize(15.0);
-        //        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
-        textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, -1, 0, 1);//滚动指示器 皮条
-        textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
-        textView.autocorrectionType = .No
-        textView.keyboardType = UIKeyboardType.Default;
-        textView.returnKeyType = UIReturnKeyType.Done;
-        textView.enablesReturnKeyAutomatically = true;
-        
-        textView.delegate = self
-        textView.textColor = UIColor(white: 0.200, alpha: 1.000)
-        textView.backgroundColor = UIColor.greenColor()
-        textView.addObserver(self, forKeyPath: "contentSize", options: NSKeyValueObservingOptions.New, context: nil)
-        textView.scrollsToTop = false
-        keyboardView.addSubview(textView)
-        
-        placeholderLabel.textAlignment = NSTextAlignment.Left
-        placeholderLabel.numberOfLines = 1
-        placeholderLabel.backgroundColor = UIColor.clearColor()
-        placeholderLabel.textColor = UIColor.lightGrayColor()
-        placeholderLabel.font = textView.font;
-        placeholderLabel.hidden = false
-        placeholderLabel.text = "placeholder"
-        textView.addSubview(placeholderLabel)
-        
-        
-        leftButton.backgroundColor = UIColor.redColor()
-        leftButton.titleLabel?.font = UIFont.systemFontOfSize(14.0)
-        leftButton.setTitle("Left", forState: UIControlState.Normal)
-        leftButton.addTarget(self, action: #selector(SYKeyboardTextField.leftButtonAction(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-        keyboardView.addSubview(leftButton)
-        
-        rightButton.backgroundColor = UIColor.redColor()
-        rightButton.titleLabel?.font = UIFont.systemFontOfSize(14.0)
-        rightButton.setTitle("Right", forState: UIControlState.Normal)
-        rightButton.addTarget(self, action: #selector(SYKeyboardTextField.rightButtonAction(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-        keyboardView.addSubview(rightButton)
-        
-        self.registeringKeyboardNotification()
-        
-    }
-    
-    //便利初始化方法 通过关键字 convenience 然后 再通过 self.xxx 指向 指定构造函数
-    public convenience init(point : CGPoint,width : CGFloat) {
-        self.init(frame: CGRectMake(point.x, point.y, width, keyboardViewDefaultHeight))
-    }
-
-    public required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-
-    public func show () {
-        self.textView.becomeFirstResponder()
-    }
-    
-    public func hide () {
-        self.textView.resignFirstResponder()
-        self.endEditing(true)
-    }
+    open lazy var keyboardView = UIView()
+    open lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
+    open lazy var placeholderLabel = UILabel()
+    open lazy var textViewBackground = UIImageView()
+    open lazy var leftButton = UIButton()
+    open lazy var rightButton = UIButton()
     public func clearTestColor() {
-        self.backgroundColor = UIColor.clearColor()
-        leftButton.backgroundColor = UIColor.clearColor()
-        rightButton.backgroundColor = UIColor.clearColor()
-        textView.backgroundColor = UIColor.clearColor()
-        textViewBackground.backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
+        leftButton.backgroundColor = UIColor.clear
+        rightButton.backgroundColor = UIColor.clear
+        textView.backgroundColor = UIColor.clear
+        textViewBackground.backgroundColor = UIColor.clear
     }
     
-    func leftButtonAction(button : UIButton) {
-        self.delegate?.keyboardTextFieldPressLeftButton?(self)
-    }
+
+    //Layout
+    fileprivate var lastKeyboardFrame : CGRect = CGRect.zero
+
+    open var leftRightDistance : CGFloat = 8.0
+    open var middleDistance : CGFloat = 8.0
+
+    open var buttonMaxWidth : CGFloat = 65.0
+    open var buttonMinWidth : CGFloat = 45.0
     
-    func rightButtonAction(button : UIButton) {
-        self.delegate?.keyboardTextFieldPressRightButton?(self)
-    }
-    
-  
-    public var leftRightDistance : CGFloat = 8.0
-    public var middleDistance : CGFloat = 8.0
-    
-    public var buttonMaxWidth : CGFloat = 65.0
-    public var buttonMinWidth : CGFloat = 45.0
-    
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
 
-        if leftButtonHidden == false {
+        if isLeftButtonHidden == false {
             var leftButtonWidth : CGFloat = 0.0
-            self.leftButton.sizeToFit()
-            if (buttonMinWidth <= leftButton.width) {
-                leftButtonWidth = leftButton.width + 10
+            leftButton.sizeToFit()
+            if (buttonMinWidth <= leftButton.bounds.size.width) {
+                leftButtonWidth = leftButton.bounds.size.width + 10
             }else {
                 leftButtonWidth = buttonMinWidth
             }
-            if (leftButton.width > buttonMaxWidth)
+            if (leftButton.bounds.size.width > buttonMaxWidth)
             {
                 leftButtonWidth = buttonMaxWidth
             }
-            leftButton.frame = CGRectMake(leftRightDistance, 0, leftButtonWidth, textViewDefaultHeight);
+            leftButton.frame = CGRect(x: leftRightDistance, y: 0, width: leftButtonWidth, height: textViewDefaultHeight);
             leftButton.toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
         }
         
-        if rightButtonHidden == false {
+        if isRightButtonHidden == false {
             var rightButtonWidth : CGFloat = 0.0
-            self.rightButton.sizeToFit()
-            if (buttonMinWidth <= rightButton.width) {
-                rightButtonWidth = rightButton.width + 10;
+            rightButton.sizeToFit()
+            if (buttonMinWidth <= rightButton.bounds.size.width) {
+                rightButtonWidth = rightButton.bounds.size.width + 10;
             }else {
                 rightButtonWidth = buttonMinWidth
             }
-            if (rightButton.width > buttonMaxWidth)
+            if (rightButton.bounds.size.width > buttonMaxWidth)
             {
                 rightButtonWidth = buttonMaxWidth;
             }
-            rightButton.frame = CGRectMake(keyboardView.width - leftRightDistance - rightButtonWidth, 0, rightButtonWidth, textViewDefaultHeight);
+            rightButton.frame = CGRect(x: keyboardView.bounds.size.width - leftRightDistance - rightButtonWidth, y: 0, width: rightButtonWidth, height: textViewDefaultHeight);
             rightButton.toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
         }
         
         textView.frame =
-            CGRectMake(
-                (leftButtonHidden == false ? leftButton.right + middleDistance : leftRightDistance),
-                (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0 + 0.5,
-                keyboardView.width
-                    - (leftButtonHidden == false ? leftButton.width + middleDistance:0)
-                    - (rightButtonHidden == false ? rightButton.width + middleDistance:0)
+            CGRect(
+                x: (isLeftButtonHidden == false ? leftButton.frame.origin.x + leftButton.bounds.size.width + middleDistance : leftRightDistance),
+                y: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0 + 0.5,
+                width: keyboardView.bounds.size.width
+                    - (isLeftButtonHidden == false ? leftButton.bounds.size.width + middleDistance:0)
+                    - (isRightButtonHidden == false ? rightButton.bounds.size.width + middleDistance:0)
                     - leftRightDistance * 2,
-                textViewCurrentHeightForLines(self.textView.numberOfLines())
+                height: textViewCurrentHeightForLines(textView.numberOfLines())
         )
         textViewBackground.frame = textView.frame;
         
-        if placeholderLabel.textAlignment == .Left {
+        if placeholderLabel.textAlignment == .left {
             placeholderLabel.sizeToFit()
-            placeholderLabel.origin = CGPointMake(8.0, (textViewDefaultHeight - placeholderLabel.height) / 2);
+            placeholderLabel.frame.origin = CGPoint(x: 8.0, y: (textViewDefaultHeight - placeholderLabel.bounds.size.height) / 2);
             
-        }else if placeholderLabel.textAlignment == .Center {
+        }else if placeholderLabel.textAlignment == .center {
            placeholderLabel.frame = placeholderLabel.superview!.bounds
         }
     }
  
     deinit {
         if SYKeyboardTextFieldDebugMode {
-            print("\(NSStringFromClass(self.classForCoder)) has release!")
+            print("\(NSStringFromClass(classForCoder)) has release!")
         }
         
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
-    
+    fileprivate var isHideing = false
 }
 
-
 //MARK: TextViewHeight
-
 extension SYKeyboardTextField {
 
-    private func textViewCurrentHeightForLines(numberOfLines : Int) -> CGFloat
-    {
-        var height = textViewDefaultHeight - self.textView.font!.lineHeight
-        let lineTotalHeight = self.textView.font!.lineHeight * CGFloat(numberOfLines)
+    fileprivate func textViewCurrentHeightForLines(_ numberOfLines : Int) -> CGFloat {
+        var height = textViewDefaultHeight - textView.font!.lineHeight
+        let lineTotalHeight = textView.font!.lineHeight * CGFloat(numberOfLines)
         height += CGFloat(roundf(Float(lineTotalHeight)))
         return CGFloat(Int(height));
     }
     
-    private func appropriateInputbarHeight() -> CGFloat
-    {
+    fileprivate func appropriateInputbarHeight() -> CGFloat {
         var height : CGFloat = 0.0;
         
-        if self.textView.numberOfLines() == 1 {
+        if textView.numberOfLines() == 1 {
             height = textViewDefaultHeight;
-        }else if self.textView.numberOfLines() < self.maxNumberOfLines {
-            height = self.textViewCurrentHeightForLines(self.textView.numberOfLines())
+        }else if textView.numberOfLines() < maxNumberOfLines {
+            height = textViewCurrentHeightForLines(textView.numberOfLines())
         }
         else {
-            height = self.textViewCurrentHeightForLines(self.maxNumberOfLines)
+            height = textViewCurrentHeightForLines(maxNumberOfLines)
         }
         
         height += keyboardViewDefaultHeight - textViewDefaultHeight;
@@ -316,27 +306,26 @@ extension SYKeyboardTextField {
         return CGFloat(roundf(Float(height)));
     }
     
-    override public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         guard let object = object,let change = change else { return }
         
-        if object.isEqual(self.textView) && keyPath == "contentSize" {
+        if (object as AnyObject).isEqual(textView) && keyPath == "contentSize" {
             if SYKeyboardTextFieldDebugMode {
-                let newValue = change[NSKeyValueChangeNewKey]?.CGSizeValue()
-                print("\(newValue)---\(self.appropriateInputbarHeight())")
+                let newValue = (change[NSKeyValueChangeKey.newKey] as AnyObject).cgSizeValue
+                print("\(newValue)---\(appropriateInputbarHeight())")
             }
             
-            let newKeyboardHeight = self.appropriateInputbarHeight()
-            if newKeyboardHeight != keyboardView.height && self.superview != nil {
-                UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                    let lastKeyboardFrameHeight = (self.lastKeyboardFrame.origin.y == 0.0 ? self.superview!.height : self.lastKeyboardFrame.origin.y)
-                    self.frame = CGRectMake(self.frame.origin.x,  lastKeyboardFrameHeight - newKeyboardHeight, self.frame.size.width, newKeyboardHeight)
+            let newKeyboardHeight = appropriateInputbarHeight()
+            if newKeyboardHeight != keyboardView.bounds.size.height && superview != nil {
+                UIView.animate(withDuration: 0.2, delay: 0.0, options: UIViewAnimationOptions(), animations: { () -> Void in
+                    let lastKeyboardFrameHeight = (self.lastKeyboardFrame.origin.y == 0.0 ? self.superview!.bounds.size.height : self.lastKeyboardFrame.origin.y)
+                    self.frame = CGRect(x: self.frame.origin.x,  y: lastKeyboardFrameHeight - newKeyboardHeight, width: self.frame.size.width, height: newKeyboardHeight)
                     }, completion:nil
                 )
             }
         }
     }
-    
 }
 
 //MARK: Keyboard Notification
@@ -345,107 +334,115 @@ extension SYKeyboardTextField {
     var keyboardAnimationOptions : UIViewAnimationOptions {
         return  UIViewAnimationOptions(rawValue: (7 as UInt) << 16)
     }
-    var keyboardAnimationDuration : NSTimeInterval {
-        return  NSTimeInterval(0.25)
+    var keyboardAnimationDuration : TimeInterval {
+        return  TimeInterval(0.25)
     }
     
     func registeringKeyboardNotification() {
         //  Registering for keyboard notification.
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillShow(_:)),name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidShow(_:)),name: UIKeyboardDidShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillShow(_:)),name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidShow(_:)),name: NSNotification.Name.UIKeyboardDidShow, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillHide(_:)),name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidHide(_:)),name: UIKeyboardDidHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillHide(_:)),name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidHide(_:)),name: NSNotification.Name.UIKeyboardDidHide, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillChangeFrame(_:)),name:UIKeyboardWillChangeFrameNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidChangeFrame(_:)),name:UIKeyboardDidChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillChangeFrame(_:)),name:NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidChangeFrame(_:)),name:NSNotification.Name.UIKeyboardDidChangeFrame, object: nil)
         
         //  Registering for orientation changes notification
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SYKeyboardTextField.willChangeStatusBarOrientation(_:)),name: UIApplicationWillChangeStatusBarOrientationNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.willChangeStatusBarOrientation(_:)),name: NSNotification.Name.UIApplicationWillChangeStatusBarOrientation, object: nil)
     
     }
     
-    func keyboardWillShow(notification : NSNotification) {
-        if textView.isFirstResponder() {
-            self.delegate?.keyboardTextFieldWillShow?(self)
+    func keyboardWillShow(_ notification : Notification) {
+        if textView.isFirstResponder {
+            delegate?.keyboardTextFieldWillShow?(self)
         }
     }
-    func keyboardDidShow(notification : NSNotification) {
-        if textView.isFirstResponder() {
-            self.delegate?.keyboardTextFieldDidShow?(self)
+    func keyboardDidShow(_ notification : Notification) {
+        if textView.isFirstResponder {
+            delegate?.keyboardTextFieldDidShow?(self)
         }
     }
-    func keyboardWillHide(notification : NSNotification) {
-        if textView.isFirstResponder() {
-            hideing = true
-            self.delegate?.keyboardTextFieldWillHide?(self)
+    func keyboardWillHide(_ notification : Notification) {
+        if textView.isFirstResponder {
+            isHideing = true
+            delegate?.keyboardTextFieldWillHide?(self)
         }
     }
-    func keyboardDidHide(notification : NSNotification) {
-        if hideing {
-            hideing = false
-            self.delegate?.keyboardTextFieldDidHide?(self)
+    func keyboardDidHide(_ notification : Notification) {
+        if isHideing {
+            isHideing = false
+            delegate?.keyboardTextFieldDidHide?(self)
         }
     }
-    func keyboardWillChangeFrame(notification : NSNotification) {
-        if self.window == nil { return }
-        if !self.window!.keyWindow { return }
+    func keyboardWillChangeFrame(_ notification : Notification) {
+        if window == nil { return }
+        if !window!.isKeyWindow { return }
         
-        if textView.isFirstResponder() {
-            var userInfo = notification.userInfo as! [String : AnyObject]
+        if textView.isFirstResponder {
+            var userInfo = (notification as NSNotification).userInfo as! [String : AnyObject]
             let keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
-            let keyboardFrame = keyboardFrameValue.CGRectValue()
-            lastKeyboardFrame = self.superview!.convertRect(keyboardFrame, fromView: UIApplication.sharedApplication().keyWindow)
+            let keyboardFrame = keyboardFrameValue.cgRectValue
+            lastKeyboardFrame = superview!.convert(keyboardFrame, from: UIApplication.shared.keyWindow)
             if SYKeyboardTextFieldDebugMode {
                 print("keyboardFrame : \(keyboardFrame)")
             }
             
-            UIView.animateWithDuration(keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
-                self.top = self.lastKeyboardFrame.origin.y - self.keyboardView.height
+            UIView.animate(withDuration: keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
+                self.frame.origin.y = self.lastKeyboardFrame.origin.y - self.keyboardView.bounds.size.height
                 }, completion: nil)
             
         }
     }
     
-    func keyboardDidChangeFrame(notification : NSNotification) {}
-    func willChangeStatusBarOrientation(notification : NSNotification) {}
+    func keyboardDidChangeFrame(_ notification : Notification) {}
+    func willChangeStatusBarOrientation(_ notification : Notification) {}
 
 }
 
 
 //MARK: TapButtonAction
 extension SYKeyboardTextField {
-
-    private var tapButtonTag : Int { return 12345 }
-    private var tapButton : UIButton { return self.superview!.viewWithTag(tapButtonTag) as! UIButton }
-    func tapAction(button : UIButton) {
-        self.hide()
+    
+    func leftButtonAction(_ button : UIButton) {
+        delegate?.keyboardTextFieldPressLeftButton?(self)
     }
     
-    private func setTapButtonHidden(hidden : Bool) {
-        self.tapButton.hidden = hidden
+    func rightButtonAction(_ button : UIButton) {
+        delegate?.keyboardTextFieldPressRightButton?(self)
+    }
+    
+    fileprivate var tapButtonTag : Int { return 12345 }
+    fileprivate var tapButton : UIButton { return superview!.viewWithTag(tapButtonTag) as! UIButton }
+    func tapAction(_ button : UIButton) {
+        hide()
+    }
+    
+    fileprivate func setTapButtonHidden(_ hidden : Bool) {
+        tapButton.isHidden = hidden
         if hidden == false {
-            if let tapButtonSuperView = self.tapButton.superview {
-                tapButtonSuperView.insertSubview(self.tapButton, belowSubview: self)
+            if let tapButtonSuperView = tapButton.superview {
+                tapButtonSuperView.insertSubview(tapButton, belowSubview: self)
             }
         }
     }
     
-    override public func didMoveToSuperview() {
-        if let superview = self.superview {
+    override open func didMoveToSuperview() {
+        if let superview = superview {
             let tapButton = UIButton(frame: superview.bounds)
-            tapButton.addTarget(self, action: #selector(SYKeyboardTextField.tapAction(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            tapButton.addTarget(self, action: #selector(SYKeyboardTextField.tapAction(_:)), for: UIControlEvents.touchUpInside)
             tapButton.tag = tapButtonTag
-            tapButton.hidden = true
-            tapButton.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
-            tapButton.backgroundColor = UIColor.clearColor()
-            superview.insertSubview(tapButton, atIndex: 0);
+            tapButton.isHidden = true
+            tapButton.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
+            tapButton.backgroundColor = UIColor.clear
+            superview.insertSubview(tapButton, at: 0);
         }
     }
     
-    override public func willMoveToSuperview(newSuperview: UIView?) {
-        if ((self.superview != nil) && newSuperview == nil) {
-            self.superview?.viewWithTag(tapButtonTag)?.removeFromSuperview()
+    override open func willMove(toSuperview newSuperview: UIView?) {
+        if ((superview != nil) && newSuperview == nil) {
+            superview?.viewWithTag(tapButtonTag)?.removeFromSuperview()
             textView.removeObserver(self, forKeyPath: "contentSize", context: nil)
         }
     }
@@ -455,7 +452,7 @@ extension SYKeyboardTextField {
 //MARK: UITextViewDelegate
 extension SYKeyboardTextField : UITextViewDelegate {
     
-    public func textViewDidChange(textView: UITextView) {
+    public func textViewDidChange(_ textView: UITextView) {
         
         if (textView.text.characters.isEmpty) {
             placeholderLabel.alpha = 1
@@ -464,30 +461,30 @@ extension SYKeyboardTextField : UITextViewDelegate {
             placeholderLabel.alpha = 0
         }
         
-        self.delegate?.keyboardTextField?(self, didChangeText: self.textView.text)
+        delegate?.keyboardTextField?(self, didChangeText: textView.text)
     }
     
-    public func textViewDidBeginEditing(textView: UITextView) {
-        self.setTapButtonHidden(false)
+    public func textViewDidBeginEditing(_ textView: UITextView) {
+        setTapButtonHidden(false)
     }
     
-    public func textViewDidEndEditing(textView: UITextView) {
-        self.setTapButtonHidden(true)
+    public func textViewDidEndEditing(_ textView: UITextView) {
+        setTapButtonHidden(true)
     }
     
-    public func textViewShouldBeginEditing(textView: UITextView) -> Bool {
+    public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         return true
     }
 
-    public func textViewShouldEndEditing(textView: UITextView) -> Bool {
+    public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
         return true
     }
     
-    public func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
-        if sending { return false }
+    public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if isSending { return false }
         if text == "\n" {
-            if sending == false {
-                self.delegate?.keyboardTextFieldPressReturnButton?(self)
+            if isSending == false {
+                delegate?.keyboardTextFieldPressReturnButton?(self)
             }
             return false
         }
@@ -495,37 +492,50 @@ extension SYKeyboardTextField : UITextViewDelegate {
     }
 }
 
-public class SYKeyboardTextView : UITextView {
+open class SYKeyboardTextView : UITextView {
+    
     private var hasDragging : Bool = false
-    override public func layoutSubviews() {
+    
+    override open func layoutSubviews() {
         super.layoutSubviews()
-        if self.dragging == false {
+        if isDragging == false {
             if hasDragging {
-                let delayTime = dispatch_time(DISPATCH_TIME_NOW,Int64(1 * Double(NSEC_PER_SEC)))
-                dispatch_after(delayTime, dispatch_get_main_queue()) {
+                let delayTime = DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+                DispatchQueue.main.asyncAfter(deadline: delayTime) {
                     self.hasDragging = false
                 }
             }else {
                 if selectedRange.location == text.characters.count {
-                    self.contentOffset = CGPointMake(self.contentOffset.x, (self.contentSize.height + 2) - self.height)
+                    contentOffset = CGPoint(x: contentOffset.x, y: (contentSize.height + 2) - bounds.size.height)
                 }
             }
-            
         }else {
             hasDragging = true
         }
     }
     
 }
-private var SYKeyboardTextFieldDebugMode : Bool = false
 
 //MARK: UITextView extension
 extension UITextView {
-
-    func numberOfLines() -> Int
-    {
-        let line = self.contentSize.height / self.font!.lineHeight
+    
+    fileprivate func numberOfLines() -> Int {
+        let line = contentSize.height / font!.lineHeight
         if line < 1.0 { return 1 }
         return abs(Int(line))
+    }
+}
+
+extension UIView {
+    /**
+     将视图移动到父视图的底端
+     - parameter offset: 可进行微调 大于0 则  小于0 则
+     */
+    fileprivate func toBottom(offset : CGFloat = 0.0) {
+        if let superView = superview {
+            frame.origin.y = superView.bounds.size.height - offset - frame.size.height;
+        }else {
+            print("UIView+SYAutoLayout toBottom 没有 superview");
+        }
     }
 }

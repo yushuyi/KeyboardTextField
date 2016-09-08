@@ -15,11 +15,11 @@ class ViewController: UIViewController {
     
     override func loadView() {
         super.loadView()
-        keyboardTextField = SYKeyboardTextField(point: CGPointMake(0, 0), width: self.view.width)
+        keyboardTextField = SYKeyboardTextField(point: CGPoint(x: 0, y: 0), width: self.view.bounds.size.width)
         keyboardTextField.delegate = self
-        keyboardTextField.leftButtonHidden = false
-        keyboardTextField.rightButtonHidden = false
-        keyboardTextField.autoresizingMask = [UIViewAutoresizing.FlexibleWidth , UIViewAutoresizing.FlexibleTopMargin]
+        keyboardTextField.isLeftButtonHidden = false
+        keyboardTextField.isRightButtonHidden = false
+        keyboardTextField.autoresizingMask = [UIViewAutoresizing.flexibleWidth , UIViewAutoresizing.flexibleTopMargin]
         self.view.addSubview(keyboardTextField)
         keyboardTextField.toFullyBottom()
     }
@@ -38,7 +38,27 @@ class ViewController: UIViewController {
 
 //MARK: SYKeyboardTextFieldDelegate
 extension ViewController : SYKeyboardTextFieldDelegate {
-    func keyboardTextFieldPressReturnButton(keyboardTextField: SYKeyboardTextField) {
+    func keyboardTextFieldPressReturnButton(_ keyboardTextField: SYKeyboardTextField) {
         UIAlertView(title: "", message: "Action", delegate: nil, cancelButtonTitle: "OK").show()
     }
 }
+
+
+extension UIView {
+    func toFullyBottom() {
+        self.bottom = superview!.bounds.size.height
+        self.autoresizingMask = [UIViewAutoresizing.flexibleTopMargin, UIViewAutoresizing.flexibleWidth]
+    }
+    
+    public var bottom: CGFloat{
+        get {
+            return self.frame.origin.y + self.frame.size.height
+        }
+        set {
+            var frame = self.frame;
+            frame.origin.y = newValue - frame.size.height;
+            self.frame = frame;
+        }
+    }
+}
+
