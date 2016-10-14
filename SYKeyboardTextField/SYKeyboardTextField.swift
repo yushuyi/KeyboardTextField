@@ -115,13 +115,13 @@ open class SYKeyboardTextField: UIView {
         
         leftButton.backgroundColor = UIColor.red
         leftButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-        leftButton.setTitle("Left", for: UIControlState())
+        leftButton.setTitle("Left", for: .normal)
         leftButton.addTarget(self, action: #selector(SYKeyboardTextField.leftButtonAction(_:)), for: UIControlEvents.touchUpInside)
         keyboardView.addSubview(leftButton)
         
         rightButton.backgroundColor = UIColor.red
         rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
-        rightButton.setTitle("Right", for: UIControlState())
+        rightButton.setTitle("Right", for: .normal)
         rightButton.addTarget(self, action: #selector(SYKeyboardTextField.rightButtonAction(_:)), for: UIControlEvents.touchUpInside)
         keyboardView.addSubview(rightButton)
         
@@ -185,12 +185,12 @@ open class SYKeyboardTextField: UIView {
     
     
     //UI
-    open lazy var keyboardView = UIView()
-    open lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
-    open lazy var placeholderLabel = UILabel()
-    open lazy var textViewBackground = UIImageView()
-    open lazy var leftButton = UIButton()
-    open lazy var rightButton = UIButton()
+    public lazy var keyboardView = UIView()
+    public lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
+    public lazy var placeholderLabel = UILabel()
+    public lazy var textViewBackground = UIImageView()
+    public lazy var leftButton = UIButton()
+    public lazy var rightButton = UIButton()
     public func clearTestColor() {
         backgroundColor = UIColor.clear
         leftButton.backgroundColor = UIColor.clear
@@ -225,7 +225,7 @@ open class SYKeyboardTextField: UIView {
                 leftButtonWidth = buttonMaxWidth
             }
             leftButton.frame = CGRect(x: leftRightDistance, y: 0, width: leftButtonWidth, height: textViewDefaultHeight);
-            leftButton.toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
+            leftButton.ktf_toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
         }
         
         if isRightButtonHidden == false {
@@ -241,18 +241,18 @@ open class SYKeyboardTextField: UIView {
                 rightButtonWidth = buttonMaxWidth;
             }
             rightButton.frame = CGRect(x: keyboardView.bounds.size.width - leftRightDistance - rightButtonWidth, y: 0, width: rightButtonWidth, height: textViewDefaultHeight);
-            rightButton.toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
+            rightButton.ktf_toBottom(offset: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0)
         }
         
         textView.frame =
             CGRect(
-                x: (isLeftButtonHidden == false ? leftButton.frame.origin.x + leftButton.bounds.size.width + middleDistance : leftRightDistance),
+                x: (isLeftButtonHidden == false ? leftButton.frame.origin.x + leftButton.bounds.size.width + middleDistance : leftRightDistance + middleDistance),
                 y: (keyboardViewDefaultHeight - textViewDefaultHeight) / 2.0 + 0.5,
                 width: keyboardView.bounds.size.width
-                    - (isLeftButtonHidden == false ? leftButton.bounds.size.width + middleDistance:0)
-                    - (isRightButtonHidden == false ? rightButton.bounds.size.width + middleDistance:0)
+                    - (isLeftButtonHidden == false ? leftButton.bounds.size.width + middleDistance:middleDistance)
+                    - (isRightButtonHidden == false ? rightButton.bounds.size.width + middleDistance:middleDistance)
                     - leftRightDistance * 2,
-                height: textViewCurrentHeightForLines(textView.numberOfLines())
+                height: textViewCurrentHeightForLines(textView.ktf_numberOfLines())
         )
         textViewBackground.frame = textView.frame;
         
@@ -289,10 +289,10 @@ extension SYKeyboardTextField {
     fileprivate func appropriateInputbarHeight() -> CGFloat {
         var height : CGFloat = 0.0;
         
-        if textView.numberOfLines() == 1 {
+        if textView.ktf_numberOfLines() == 1 {
             height = textViewDefaultHeight;
-        }else if textView.numberOfLines() < maxNumberOfLines {
-            height = textViewCurrentHeightForLines(textView.numberOfLines())
+        }else if textView.ktf_numberOfLines() < maxNumberOfLines {
+            height = textViewCurrentHeightForLines(textView.ktf_numberOfLines())
         }
         else {
             height = textViewCurrentHeightForLines(maxNumberOfLines)
@@ -308,12 +308,13 @@ extension SYKeyboardTextField {
     
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        guard let object = object,let change = change else { return }
+        guard let object = object as? SYKeyboardTextView,let change = change else { return }
         
-        if (object as AnyObject).isEqual(textView) && keyPath == "contentSize" {
+        if object == textView && keyPath == "contentSize" {
             if SYKeyboardTextFieldDebugMode {
-                let newValue = (change[NSKeyValueChangeKey.newKey] as AnyObject).cgSizeValue
-                print("\(newValue)---\(appropriateInputbarHeight())")
+                if let sizeValue = (change[NSKeyValueChangeKey.newKey] as? NSValue)?.cgSizeValue {
+                    print("\(sizeValue)---\(appropriateInputbarHeight())")
+                }
             }
             
             let newKeyboardHeight = appropriateInputbarHeight()
@@ -381,7 +382,7 @@ extension SYKeyboardTextField {
         if !window!.isKeyWindow { return }
         
         if textView.isFirstResponder {
-            var userInfo = (notification as NSNotification).userInfo as! [String : AnyObject]
+            guard let userInfo = notification.userInfo else { return }
             let keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
             let keyboardFrame = keyboardFrameValue.cgRectValue
             lastKeyboardFrame = superview!.convert(keyboardFrame, from: UIApplication.shared.keyWindow)
@@ -405,17 +406,17 @@ extension SYKeyboardTextField {
 //MARK: TapButtonAction
 extension SYKeyboardTextField {
     
-    func leftButtonAction(_ button : UIButton) {
+    @objc func leftButtonAction(_ button : UIButton) {
         delegate?.keyboardTextFieldPressLeftButton?(self)
     }
     
-    func rightButtonAction(_ button : UIButton) {
+    @objc func rightButtonAction(_ button : UIButton) {
         delegate?.keyboardTextFieldPressRightButton?(self)
     }
     
     fileprivate var tapButtonTag : Int { return 12345 }
     fileprivate var tapButton : UIButton { return superview!.viewWithTag(tapButtonTag) as! UIButton }
-    func tapAction(_ button : UIButton) {
+    @objc func tapAction(_ button : UIButton) {
         hide()
     }
     
@@ -492,7 +493,7 @@ extension SYKeyboardTextField : UITextViewDelegate {
     }
 }
 
-open class SYKeyboardTextView : UITextView {
+public final class SYKeyboardTextView : UITextView {
     
     private var hasDragging : Bool = false
     
@@ -519,7 +520,7 @@ open class SYKeyboardTextView : UITextView {
 //MARK: UITextView extension
 extension UITextView {
     
-    fileprivate func numberOfLines() -> Int {
+    fileprivate func ktf_numberOfLines() -> Int {
         let line = contentSize.height / font!.lineHeight
         if line < 1.0 { return 1 }
         return abs(Int(line))
@@ -531,7 +532,7 @@ extension UIView {
      将视图移动到父视图的底端
      - parameter offset: 可进行微调 大于0 则  小于0 则
      */
-    fileprivate func toBottom(offset : CGFloat = 0.0) {
+    fileprivate func ktf_toBottom(offset : CGFloat = 0.0) {
         if let superView = superview {
             frame.origin.y = superView.bounds.size.height - offset - frame.size.height;
         }else {
