@@ -1,7 +1,7 @@
 //
 //  SYKeyboardTextField.swift
 //  DoudouApp
-//  Version 2.0 iOS 8.0 and Swift 3 and Xcode8 GM Seed
+//  Version 3.0 iOS 8.0 and Swift 3 and Xcode8.1
 //  Created by yushuyi on 15/1/17.
 //  Copyright (c) 2015年 DoudouApp. All rights reserved.
 //
@@ -24,26 +24,12 @@ import UIKit
     点击键盘上面的回车按钮响应委托
     */
     @objc optional func keyboardTextFieldPressReturnButton(_ keyboardTextField :SYKeyboardTextField)
+    
+    @objc optional func keyboardTextFieldWillBeginEditing(_ keyboardTextField :SYKeyboardTextField)
+   
+    @objc optional func keyboardTextFieldWillEndEditing(_ keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldDidEndEditing(_ keyboardTextField :SYKeyboardTextField)
 
-    /**
-    键盘将要隐藏时响应的委托
-    */
-    @objc optional func keyboardTextFieldWillHide(_ keyboardTextField :SYKeyboardTextField)
-
-    /**
-    键盘已经隐藏时响应的委托
-    */
-    @objc optional func keyboardTextFieldDidHide(_ keyboardTextField :SYKeyboardTextField)
-
-    /**
-    键盘将要显示时响应的委托
-    */
-    @objc optional func keyboardTextFieldWillShow(_ keyboardTextField :SYKeyboardTextField)
-
-    /**
-    键盘已经显示时响应的委托
-    */
-    @objc optional func keyboardTextFieldDidShow(_ keyboardTextField :SYKeyboardTextField)
     
     /**
     键盘文本内容被改变时触发
@@ -82,7 +68,6 @@ open class SYKeyboardTextField: UIView {
         
         keyboardView.frame = bounds
         keyboardView.backgroundColor = UIColor.yellow
-        keyboardView.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
         addSubview(keyboardView)
         
         keyboardView.addSubview(textViewBackground)
@@ -93,7 +78,7 @@ open class SYKeyboardTextField: UIView {
         textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
         textView.autocorrectionType = .no
         textView.keyboardType = UIKeyboardType.default;
-        textView.returnKeyType = UIReturnKeyType.done;
+        textView.returnKeyType = UIReturnKeyType.send;
         textView.enablesReturnKeyAutomatically = true;
         
         textView.delegate = self
@@ -134,8 +119,27 @@ open class SYKeyboardTextField: UIView {
     }
     
     open func hide() {
-        textView.resignFirstResponder()
+        delegate?.keyboardTextFieldWillEndEditing?(self)
+        isEditing = false
+        isHideing = true
         endEditing(true)
+        setTapButtonHidden(true)
+    }
+    
+    open func addAttachmentView(_ view: UIView) {
+        removeAttachmentView()
+        insertSubview(view, at: 0)
+        view.alpha = 0
+        view.isUserInteractionEnabled = false
+        view.autoresizingMask = []
+        attachmentView = view
+    }
+    
+    public func removeAttachmentView() {
+        if let attachmentView = attachmentView {
+            attachmentView.removeFromSuperview()
+            self.attachmentView = nil
+        }
     }
     
     //Status
@@ -148,10 +152,7 @@ open class SYKeyboardTextField: UIView {
             rightButton.isEnabled = isEnabled
         }
     }
-    
-    public var isEditing : Bool {
-        return textView.isFirstResponder
-    }
+    public var isEditing: Bool = false
     
     public var isLeftButtonHidden : Bool = true {
         didSet {
@@ -185,6 +186,7 @@ open class SYKeyboardTextField: UIView {
     
     
     //UI
+    public var attachmentView: UIView?
     public lazy var keyboardView = UIView()
     public lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
     public lazy var placeholderLabel = UILabel()
@@ -211,7 +213,13 @@ open class SYKeyboardTextField: UIView {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-
+        
+        if isEditing {
+            keyboardView.frame = CGRect(x: 0, y: (attachmentView?.bounds.size.height ?? 0), width: bounds.size.width, height: bounds.size.height - (attachmentView?.bounds.size.height ?? 0))
+        }else {
+            keyboardView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height)
+        }
+        
         if isLeftButtonHidden == false {
             var leftButtonWidth : CGFloat = 0.0
             leftButton.sizeToFit()
@@ -263,6 +271,13 @@ open class SYKeyboardTextField: UIView {
         }else if placeholderLabel.textAlignment == .center {
            placeholderLabel.frame = placeholderLabel.superview!.bounds
         }
+        
+        
+        if let attachmentView = attachmentView {
+            attachmentView.bounds.size.width = bounds.size.width
+            attachmentView.frame.origin = CGPoint.zero
+        }
+
     }
  
     deinit {
@@ -321,7 +336,12 @@ extension SYKeyboardTextField {
             if newKeyboardHeight != keyboardView.bounds.size.height && superview != nil {
                 UIView.animate(withDuration: 0.2, delay: 0.0, options: UIViewAnimationOptions(), animations: { () -> Void in
                     let lastKeyboardFrameHeight = (self.lastKeyboardFrame.origin.y == 0.0 ? self.superview!.bounds.size.height : self.lastKeyboardFrame.origin.y)
-                    self.frame = CGRect(x: self.frame.origin.x,  y: lastKeyboardFrameHeight - newKeyboardHeight, width: self.frame.size.width, height: newKeyboardHeight)
+                    if self.isEditing {
+                        self.frame = CGRect(x: self.frame.origin.x,  y: lastKeyboardFrameHeight - newKeyboardHeight - (self.attachmentView?.bounds.size.height ?? 0), width: self.frame.size.width, height: newKeyboardHeight + (self.attachmentView?.bounds.size.height ?? 0))
+                    }else {
+                        self.frame = CGRect(x: self.frame.origin.x,  y: lastKeyboardFrameHeight - newKeyboardHeight, width: self.frame.size.width, height: newKeyboardHeight)
+                    }
+                    
                     }, completion:nil
                 )
             }
@@ -341,11 +361,6 @@ extension SYKeyboardTextField {
     
     func registeringKeyboardNotification() {
         //  Registering for keyboard notification.
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillShow(_:)),name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidShow(_:)),name: NSNotification.Name.UIKeyboardDidShow, object: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillHide(_:)),name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidHide(_:)),name: NSNotification.Name.UIKeyboardDidHide, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillChangeFrame(_:)),name:NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidChangeFrame(_:)),name:NSNotification.Name.UIKeyboardDidChangeFrame, object: nil)
@@ -355,46 +370,38 @@ extension SYKeyboardTextField {
     
     }
     
-    func keyboardWillShow(_ notification : Notification) {
-        if textView.isFirstResponder {
-            delegate?.keyboardTextFieldWillShow?(self)
-        }
-    }
-    func keyboardDidShow(_ notification : Notification) {
-        if textView.isFirstResponder {
-            delegate?.keyboardTextFieldDidShow?(self)
-        }
-    }
-    func keyboardWillHide(_ notification : Notification) {
-        if textView.isFirstResponder {
-            isHideing = true
-            delegate?.keyboardTextFieldWillHide?(self)
-        }
-    }
-    func keyboardDidHide(_ notification : Notification) {
-        if isHideing {
-            isHideing = false
-            delegate?.keyboardTextFieldDidHide?(self)
-        }
-    }
     func keyboardWillChangeFrame(_ notification : Notification) {
         if window == nil { return }
         if !window!.isKeyWindow { return }
         
-        if textView.isFirstResponder {
-            guard let userInfo = notification.userInfo else { return }
-            let keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
-            let keyboardFrame = keyboardFrameValue.cgRectValue
-            lastKeyboardFrame = superview!.convert(keyboardFrame, from: UIApplication.shared.keyWindow)
-            if SYKeyboardTextFieldDebugMode {
-                print("keyboardFrame : \(keyboardFrame)")
+        guard let userInfo = notification.userInfo else { return }
+        let keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
+        let keyboardFrame = keyboardFrameValue.cgRectValue
+        lastKeyboardFrame = superview!.convert(keyboardFrame, from: UIApplication.shared.keyWindow)
+        if SYKeyboardTextFieldDebugMode {
+            print("keyboardFrame : \(keyboardFrame)")
+        }
+        
+        UIView.animate(withDuration: keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
+            if self.isEditing {
+                self.frame.origin.y = self.lastKeyboardFrame.origin.y - self.keyboardView.bounds.size.height - (self.attachmentView?.bounds.size.height ?? 0)
+                self.frame.size.height = self.keyboardView.bounds.size.height + (self.attachmentView?.bounds.size.height ?? 0)
+                self.attachmentView?.alpha = 1
+                self.attachmentView?.isUserInteractionEnabled = true
+            }else {
+                self.frame.origin.y = self.lastKeyboardFrame.origin.y - self.keyboardView.bounds.size.height
+                self.frame.size.height = self.keyboardView.bounds.size.height
+                self.keyboardView.frame = self.bounds
+                self.attachmentView?.alpha = 0
+                self.attachmentView?.isUserInteractionEnabled = false
             }
             
-            UIView.animate(withDuration: keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
-                self.frame.origin.y = self.lastKeyboardFrame.origin.y - self.keyboardView.bounds.size.height
-                }, completion: nil)
-            
-        }
+        }, completion: {_ in
+            if !self.isEditing && self.isHideing {
+                self.isHideing = false
+                self.delegate?.keyboardTextFieldDidEndEditing?(self)
+            }
+        })
     }
     
     func keyboardDidChangeFrame(_ notification : Notification) {}
@@ -464,16 +471,13 @@ extension SYKeyboardTextField : UITextViewDelegate {
         
         delegate?.keyboardTextField?(self, didChangeText: textView.text)
     }
-    
-    public func textViewDidBeginEditing(_ textView: UITextView) {
-        setTapButtonHidden(false)
-    }
-    
-    public func textViewDidEndEditing(_ textView: UITextView) {
-        setTapButtonHidden(true)
-    }
-    
+
     public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        if isEditing == false {
+            delegate?.keyboardTextFieldWillBeginEditing?(self)
+        }
+        isEditing = true
+        setTapButtonHidden(false)
         return true
     }
 
@@ -490,6 +494,17 @@ extension SYKeyboardTextField : UITextViewDelegate {
             return false
         }
         return true
+    }
+}
+
+extension SYKeyboardTextField {
+    open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        if let attachmentView = attachmentView {
+            if (attachmentView.frame.contains(point)) {
+                return attachmentView.point(inside: point, with: event)
+            }
+        }
+        return super.point(inside: point, with: event)
     }
 }
 
