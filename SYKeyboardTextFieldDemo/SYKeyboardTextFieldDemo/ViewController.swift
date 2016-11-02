@@ -22,6 +22,10 @@ class ViewController: UIViewController {
         keyboardTextField.autoresizingMask = [UIViewAutoresizing.flexibleWidth , UIViewAutoresizing.flexibleTopMargin]
         self.view.addSubview(keyboardTextField)
         keyboardTextField.toFullyBottom()
+        
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 50))
+        view.backgroundColor = UIColor.red
+        keyboardTextField.addAttachmentView(view)
     }
     
     
