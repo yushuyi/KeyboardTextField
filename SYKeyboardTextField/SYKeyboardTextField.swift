@@ -1,7 +1,7 @@
 //
 //  SYKeyboardTextField.swift
 //  DoudouApp
-//  Version 3.0 iOS 8.0 and Swift 3 and Xcode8.1
+//  Version 3.1 iOS 8.0 and Swift 3 and Xcode8.2
 //  Created by yushuyi on 15/1/17.
 //  Copyright (c) 2015年 DoudouApp. All rights reserved.
 //
@@ -26,7 +26,8 @@ import UIKit
     @objc optional func keyboardTextFieldPressReturnButton(_ keyboardTextField :SYKeyboardTextField)
     
     @objc optional func keyboardTextFieldWillBeginEditing(_ keyboardTextField :SYKeyboardTextField)
-   
+    @objc optional func keyboardTextFieldDidBeginEditing(_ keyboardTextField :SYKeyboardTextField)
+
     @objc optional func keyboardTextFieldWillEndEditing(_ keyboardTextField :SYKeyboardTextField)
     @objc optional func keyboardTextFieldDidEndEditing(_ keyboardTextField :SYKeyboardTextField)
 
@@ -119,6 +120,7 @@ open class SYKeyboardTextField: UIView {
     }
     
     open func hide() {
+        attachmentView?.moveToBottom()
         delegate?.keyboardTextFieldWillEndEditing?(self)
         isEditing = false
         isHideing = true
@@ -289,6 +291,7 @@ open class SYKeyboardTextField: UIView {
     }
     
     fileprivate var isHideing = false
+    fileprivate var isShowing = false
 }
 
 //MARK: TextViewHeight
@@ -389,7 +392,7 @@ extension SYKeyboardTextField {
                 self.attachmentView?.alpha = 1
                 self.attachmentView?.isUserInteractionEnabled = true
             }else {
-                self.frame.origin.y = self.lastKeyboardFrame.origin.y - self.keyboardView.bounds.size.height
+                self.frame.origin.y = self.superview!.bounds.size.height - self.keyboardView.bounds.size.height
                 self.frame.size.height = self.keyboardView.bounds.size.height
                 self.keyboardView.frame = self.bounds
                 self.attachmentView?.alpha = 0
@@ -400,6 +403,12 @@ extension SYKeyboardTextField {
             if !self.isEditing && self.isHideing {
                 self.isHideing = false
                 self.delegate?.keyboardTextFieldDidEndEditing?(self)
+            }
+            if self.isEditing && self.isShowing {
+                self.attachmentView?.moveToTop()
+                
+                self.isShowing = false
+                self.delegate?.keyboardTextFieldDidBeginEditing?(self)
             }
         })
     }
@@ -474,6 +483,7 @@ extension SYKeyboardTextField : UITextViewDelegate {
 
     public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         if isEditing == false {
+            isShowing = true
             delegate?.keyboardTextFieldWillBeginEditing?(self)
         }
         isEditing = true
@@ -536,7 +546,12 @@ public final class SYKeyboardTextView : UITextView {
 extension UITextView {
     
     fileprivate func ktf_numberOfLines() -> Int {
-        let line = contentSize.height / font!.lineHeight
+        let text = self.text as NSString
+        let textAttributes = [NSFontAttributeName: font!]
+        var width: CGFloat = UIEdgeInsetsInsetRect(frame, textContainerInset).width
+        width -= 2.0 * textContainer.lineFragmentPadding
+        let boundingRect: CGRect = text.boundingRect(with: CGSize(width:width,height:9999), options: [NSStringDrawingOptions.usesLineFragmentOrigin , NSStringDrawingOptions.usesFontLeading], attributes: textAttributes, context: nil)
+        let line = boundingRect.height / font!.lineHeight
         if line < 1.0 { return 1 }
         return abs(Int(line))
     }
@@ -553,5 +568,13 @@ extension UIView {
         }else {
             print("UIView+SYAutoLayout toBottom 没有 superview");
         }
+    }
+    
+    public func moveToTop() {
+        superview?.bringSubview(toFront: self)
+    }
+    
+    public func moveToBottom() {
+        superview?.sendSubview(toBack: self)
     }
 }
