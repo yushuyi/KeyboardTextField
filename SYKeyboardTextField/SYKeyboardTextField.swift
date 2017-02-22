@@ -262,7 +262,10 @@ open class SYKeyboardTextField: UIView {
                     - (isLeftButtonHidden == false ? leftButton.bounds.size.width + middleDistance:middleDistance)
                     - (isRightButtonHidden == false ? rightButton.bounds.size.width + middleDistance:middleDistance)
                     - leftRightDistance * 2,
-                height: textViewCurrentHeightForLines(textView.ktf_numberOfLines())
+                height:
+                textView.ktf_numberOfLines() < maxNumberOfLines ?
+                textViewCurrentHeightForLines(textView.ktf_numberOfLines()) :
+                textViewCurrentHeightForLines(maxNumberOfLines)
         )
         textViewBackground.frame = textView.frame;
         
