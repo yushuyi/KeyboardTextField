@@ -521,30 +521,6 @@ extension SYKeyboardTextField {
     }
 }
 
-public final class SYKeyboardTextView : UITextView {
-    
-    private var hasDragging : Bool = false
-    
-    override open func layoutSubviews() {
-        super.layoutSubviews()
-        if isDragging == false {
-            if hasDragging {
-                let delayTime = DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-                DispatchQueue.main.asyncAfter(deadline: delayTime) {
-                    self.hasDragging = false
-                }
-            }else {
-                if selectedRange.location == text.characters.count {
-                    contentOffset = CGPoint(x: contentOffset.x, y: (contentSize.height + 2) - bounds.size.height)
-                }
-            }
-        }else {
-            hasDragging = true
-        }
-    }
-    
-}
-
 //MARK: UITextView extension
 extension UITextView {
     
