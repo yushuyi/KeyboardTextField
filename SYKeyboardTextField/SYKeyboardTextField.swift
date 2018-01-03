@@ -1,7 +1,7 @@
 //
 //  SYKeyboardTextField.swift
 //  DoudouApp
-//  Version 3.1 iOS 8.0 and Swift 3 and Xcode8.2
+//  Version 3.2 iOS 8.0 and Swift 4 and Xcode9.2
 //  Created by yushuyi on 15/1/17.
 //  Copyright (c) 2015年 DoudouApp. All rights reserved.
 //
@@ -74,14 +74,13 @@ open class SYKeyboardTextField: UIView {
         keyboardView.addSubview(textViewBackground)
         
         textView.font = UIFont.systemFont(ofSize: 15.0);
-        //        textView.autocapitalizationType = UITextAutocapitalizationType.Sentences
+        textView.autocapitalizationType = .none
         textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, -1, 0, 1);//滚动指示器 皮条
         textView.textContainerInset = UIEdgeInsetsMake(9.0, 3.0, 7.0, 0.0);
         textView.autocorrectionType = .no
         textView.keyboardType = UIKeyboardType.default;
-        textView.returnKeyType = UIReturnKeyType.send;
+        textView.returnKeyType = UIReturnKeyType.done;
         textView.enablesReturnKeyAutomatically = true;
-        
         textView.delegate = self
         textView.textColor = UIColor(white: 0.200, alpha: 1.000)
         textView.backgroundColor = UIColor.green
@@ -120,6 +119,10 @@ open class SYKeyboardTextField: UIView {
     }
     
     open func hide() {
+        if isAutoLayout {
+            isAutoLayout = false
+            translatesAutoresizingMaskIntoConstraints = false
+        }
         attachmentView?.moveToBottom()
         delegate?.keyboardTextFieldWillEndEditing?(self)
         isEditing = false
@@ -295,6 +298,8 @@ open class SYKeyboardTextField: UIView {
     
     fileprivate var isHideing = false
     fileprivate var isShowing = false
+    fileprivate var isAutoLayout = false
+
 }
 
 //MARK: TextViewHeight
@@ -376,7 +381,7 @@ extension SYKeyboardTextField {
     
     }
     
-    func keyboardWillChangeFrame(_ notification : Notification) {
+    @objc func keyboardWillChangeFrame(_ notification : Notification) {
         if window == nil { return }
         if !window!.isKeyWindow { return }
         
@@ -416,8 +421,8 @@ extension SYKeyboardTextField {
         })
     }
     
-    func keyboardDidChangeFrame(_ notification : Notification) {}
-    func willChangeStatusBarOrientation(_ notification : Notification) {}
+    @objc func keyboardDidChangeFrame(_ notification : Notification) {}
+    @objc func willChangeStatusBarOrientation(_ notification : Notification) {}
 
 }
 
@@ -474,7 +479,7 @@ extension SYKeyboardTextField : UITextViewDelegate {
     
     public func textViewDidChange(_ textView: UITextView) {
         
-        if (textView.text.characters.isEmpty) {
+        if (textView.text.isEmpty) {
             placeholderLabel.alpha = 1
         }
         else {
@@ -486,6 +491,10 @@ extension SYKeyboardTextField : UITextViewDelegate {
 
     public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         if isEditing == false {
+            if !translatesAutoresizingMaskIntoConstraints {
+                isAutoLayout = true
+                translatesAutoresizingMaskIntoConstraints = true
+            }
             isShowing = true
             delegate?.keyboardTextFieldWillBeginEditing?(self)
         }
@@ -534,7 +543,7 @@ public final class SYKeyboardTextView : UITextView {
                     self.hasDragging = false
                 }
             }else {
-                if selectedRange.location == text.characters.count {
+                if selectedRange.location == text.count {
                     contentOffset = CGPoint(x: contentOffset.x, y: (contentSize.height + 2) - bounds.size.height)
                 }
             }
@@ -550,7 +559,7 @@ extension UITextView {
     
     fileprivate func ktf_numberOfLines() -> Int {
         let text = self.text as NSString
-        let textAttributes = [NSFontAttributeName: font!]
+        let textAttributes = [NSAttributedStringKey.font: font!]
         var width: CGFloat = UIEdgeInsetsInsetRect(frame, textContainerInset).width
         width -= 2.0 * textContainer.lineFragmentPadding
         let boundingRect: CGRect = text.boundingRect(with: CGSize(width:width,height:9999), options: [NSStringDrawingOptions.usesLineFragmentOrigin , NSStringDrawingOptions.usesFontLeading], attributes: textAttributes, context: nil)
