@@ -49,7 +49,12 @@ fileprivate let textViewDefaultHeight : CGFloat = 36.0
 
 
 open class SYKeyboardTextField: UIView {
-
+    
+    public enum AttachmentViewLocation {
+        case up
+        case down
+    }
+    
     //Delegate
     open weak var delegate : SYKeyboardTextFieldDelegate?
     
@@ -131,13 +136,14 @@ open class SYKeyboardTextField: UIView {
         setTapButtonHidden(true)
     }
     
-    open func addAttachmentView(_ view: UIView) {
+    open func addAttachmentView(_ view: UIView,location: AttachmentViewLocation = .up) {
         removeAttachmentView()
         insertSubview(view, at: 0)
         view.alpha = 0
         view.isUserInteractionEnabled = false
         view.autoresizingMask = []
         attachmentView = view
+        attachmentViewLocation = location
     }
     
     public func removeAttachmentView() {
@@ -172,6 +178,8 @@ open class SYKeyboardTextField: UIView {
             setNeedsLayout()
         }
     }
+    
+    public var attachmentViewLocation: AttachmentViewLocation = .up
     
     //text
     public var text : String! {
@@ -220,7 +228,12 @@ open class SYKeyboardTextField: UIView {
         super.layoutSubviews()
         
         if isEditing {
-            keyboardView.frame = CGRect(x: 0, y: (attachmentView?.bounds.size.height ?? 0), width: bounds.size.width, height: bounds.size.height - (attachmentView?.bounds.size.height ?? 0))
+            switch attachmentViewLocation {
+                case .up:
+                    keyboardView.frame = CGRect(x: 0, y: (attachmentView?.bounds.size.height ?? 0), width: bounds.size.width, height: bounds.size.height - (attachmentView?.bounds.size.height ?? 0))
+                case .down:
+                    keyboardView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height - (attachmentView?.bounds.size.height ?? 0))
+            }
         }else {
             keyboardView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height)
         }
@@ -283,7 +296,12 @@ open class SYKeyboardTextField: UIView {
         
         if let attachmentView = attachmentView {
             attachmentView.bounds.size.width = bounds.size.width
-            attachmentView.frame.origin = CGPoint.zero
+            switch attachmentViewLocation {
+                case .up:
+                    attachmentView.frame.origin = CGPoint.zero
+                case .down:
+                    attachmentView.frame.origin = CGPoint(x: 0, y: keyboardView.bounds.size.height)
+            }
         }
 
     }
@@ -349,12 +367,13 @@ extension SYKeyboardTextField {
                     let lastKeyboardFrameHeight = (self.lastKeyboardFrame.origin.y == 0.0 ? self.superview!.bounds.size.height : self.lastKeyboardFrame.origin.y)
                     if self.isEditing {
                         self.frame = CGRect(x: self.frame.origin.x,  y: lastKeyboardFrameHeight - newKeyboardHeight - (self.attachmentView?.bounds.size.height ?? 0), width: self.frame.size.width, height: newKeyboardHeight + (self.attachmentView?.bounds.size.height ?? 0))
+                        self.layoutIfNeeded()
                     }else {
                         self.frame = CGRect(x: self.frame.origin.x,  y: lastKeyboardFrameHeight - newKeyboardHeight, width: self.frame.size.width, height: newKeyboardHeight)
                     }
                     
-                    }, completion:nil
-                )
+                }, completion:{_ in
+                })
             }
         }
     }
