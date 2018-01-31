@@ -5,7 +5,7 @@ SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying
 
 ## Requirements
 
-- Swift 3
+- Swift 4
 - iOS 8.0 or later 
 
 
