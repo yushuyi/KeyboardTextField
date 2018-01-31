@@ -117,6 +117,14 @@ open class SYKeyboardTextField: UIView {
         
         registeringKeyboardNotification()
         
+        
+        //当键盘的高度改变时，keyboardTextField 会吸附会去，这的过程中间会看到底部 透明蒙层，效果不好 加上这个视图以作修饰
+        let bottomBackgroundView = UIView(frame: CGRect(x: 0, y: height, width: width, height: 100))
+        bottomBackgroundView.autoresizingMask = [.flexibleTopMargin,.flexibleWidth]
+        bottomBackgroundView.backgroundColor = UIColor(red: 210.0/255.0, green: 213.0/255.0, blue: 219.0/255.0, alpha: 1.0)
+        bottomBackgroundView.isUserInteractionEnabled = false
+        insertSubview(bottomBackgroundView, at: 0)
+        
     }
 
     open func show() {
@@ -132,8 +140,17 @@ open class SYKeyboardTextField: UIView {
         delegate?.keyboardTextFieldWillEndEditing?(self)
         isEditing = false
         isHideing = true
+        
+        //这里判断一下键盘是否已经隐藏了，如果隐藏了 也需要调用一下 DidEnd回调以保证完整性
+        if let superview = self.superview {
+            if self.bottom == superview.height {
+                delegate?.keyboardTextFieldDidEndEditing?(self)
+            }
+        }
+        
         endEditing(true)
         setTapButtonHidden(true)
+        
     }
     
     open func addAttachmentView(_ view: UIView,location: AttachmentViewLocation = .up) {
@@ -151,6 +168,10 @@ open class SYKeyboardTextField: UIView {
             attachmentView.removeFromSuperview()
             self.attachmentView = nil
         }
+    }
+    
+    public func done() {
+        delegate?.keyboardTextFieldPressReturnButton?(self)
     }
     
     //Status
@@ -213,7 +234,7 @@ open class SYKeyboardTextField: UIView {
         textView.backgroundColor = UIColor.clear
         textViewBackground.backgroundColor = UIColor.clear
     }
-    
+    public var tapButtonBackgroundColor: UIColor = UIColor.clear
 
     //Layout
     fileprivate var lastKeyboardFrame : CGRect = CGRect.zero
@@ -382,10 +403,10 @@ extension SYKeyboardTextField {
 //MARK: Keyboard Notification
 extension SYKeyboardTextField {
     
-    var keyboardAnimationOptions : UIViewAnimationOptions {
+    public var keyboardAnimationOptions : UIViewAnimationOptions {
         return  UIViewAnimationOptions(rawValue: (7 as UInt) << 16)
     }
-    var keyboardAnimationDuration : TimeInterval {
+    public var keyboardAnimationDuration : TimeInterval {
         return  TimeInterval(0.25)
     }
     
@@ -458,17 +479,29 @@ extension SYKeyboardTextField {
     }
     
     fileprivate var tapButtonTag : Int { return 12345 }
-    fileprivate var tapButton : UIButton { return superview!.viewWithTag(tapButtonTag) as! UIButton }
+    public var tapButton : UIButton { return superview!.viewWithTag(tapButtonTag) as! UIButton }
     @objc func tapAction(_ button : UIButton) {
         hide()
     }
     
     fileprivate func setTapButtonHidden(_ hidden : Bool) {
-        tapButton.isHidden = hidden
         if hidden == false {
+            tapButton.isHidden = hidden
             if let tapButtonSuperView = tapButton.superview {
                 tapButtonSuperView.insertSubview(tapButton, belowSubview: self)
             }
+            tapButton.alpha = 0.0
+            UIView.animate(withDuration: keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
+                self.tapButton.alpha = 1.0
+            }, completion: {_ in
+                
+            })
+        }else {
+            UIView.animate(withDuration: keyboardAnimationDuration, delay: 0.0, options: keyboardAnimationOptions, animations: { () -> Void in
+                self.tapButton.alpha = 0.0
+            }, completion: {_ in
+                self.tapButton.isHidden = hidden
+            })
         }
     }
     
@@ -479,8 +512,8 @@ extension SYKeyboardTextField {
             tapButton.tag = tapButtonTag
             tapButton.isHidden = true
             tapButton.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
-            tapButton.backgroundColor = UIColor.clear
-            superview.insertSubview(tapButton, at: 0);
+            tapButton.backgroundColor = tapButtonBackgroundColor
+            superview.insertSubview(tapButton, at: 0)
         }
     }
     
@@ -530,22 +563,11 @@ extension SYKeyboardTextField : UITextViewDelegate {
         if isSending { return false }
         if text == "\n" {
             if isSending == false {
-                delegate?.keyboardTextFieldPressReturnButton?(self)
+                done()
             }
             return false
         }
         return true
-    }
-}
-
-extension SYKeyboardTextField {
-    open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        if let attachmentView = attachmentView {
-            if (attachmentView.frame.contains(point)) {
-                return attachmentView.point(inside: point, with: event)
-            }
-        }
-        return super.point(inside: point, with: event)
     }
 }
 
