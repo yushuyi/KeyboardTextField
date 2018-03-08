@@ -119,7 +119,7 @@ open class SYKeyboardTextField: UIView {
         
         
         //当键盘的高度改变时，keyboardTextField 会吸附会去，这的过程中间会看到底部 透明蒙层，效果不好 加上这个视图以作修饰
-        let bottomBackgroundView = UIView(frame: CGRect(x: 0, y: height, width: width, height: 100))
+        let bottomBackgroundView = UIView(frame: CGRect(x: 0, y: bounds.size.height, width: bounds.size.width, height: 100))
         bottomBackgroundView.autoresizingMask = [.flexibleTopMargin,.flexibleWidth]
         bottomBackgroundView.backgroundColor = UIColor(red: 210.0/255.0, green: 213.0/255.0, blue: 219.0/255.0, alpha: 1.0)
         bottomBackgroundView.isUserInteractionEnabled = false
@@ -143,7 +143,7 @@ open class SYKeyboardTextField: UIView {
         
         //这里判断一下键盘是否已经隐藏了，如果隐藏了 也需要调用一下 DidEnd回调以保证完整性
         if let superview = self.superview {
-            if self.bottom == superview.height {
+            if self.bottom == superview.bounds.size.height {
                 delegate?.keyboardTextFieldDidEndEditing?(self)
             }
         }
