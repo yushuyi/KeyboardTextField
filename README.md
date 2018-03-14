@@ -1,4 +1,6 @@
+<p align="center">
 <img src="https://github.com/441088327/SYKeyboardTextField/blob/master/logo.png" alt="" />
+</p>
 
 SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying input box! Write in Swift! 
 
