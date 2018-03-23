@@ -224,7 +224,7 @@ open class KeyboardTextField: UIView {
     //UI
     public var attachmentView: UIView?
     public lazy var keyboardView = UIView()
-    public lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
+    public lazy var textView : KeyboardTextView = KeyboardTextView()
     public lazy var placeholderLabel = UILabel()
     public lazy var textViewBackground = UIImageView()
     public lazy var leftButton = UIButton()
@@ -376,7 +376,7 @@ extension KeyboardTextField {
     
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        guard let object = object as? SYKeyboardTextView,let change = change else { return }
+        guard let object = object as? KeyboardTextView,let change = change else { return }
         
         if object == textView && keyPath == "contentSize" {
             if KeyboardTextFieldDebugMode {
@@ -574,7 +574,7 @@ extension KeyboardTextField : UITextViewDelegate {
     }
 }
 
-public final class SYKeyboardTextView : UITextView {
+public final class KeyboardTextView : UITextView {
     
     private var hasDragging : Bool = false
     
