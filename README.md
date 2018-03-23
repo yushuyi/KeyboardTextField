@@ -2,7 +2,7 @@
 <img src="https://github.com/441088327/SYKeyboardTextField/blob/master/logo.png" alt="" />
 </p>
 
-SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying input box! Write in Swift! 
+KeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying input box! Write in Swift! 
 
 <img src="https://github.com/441088327/SYKeyboardTextField/blob/master/SYKeyboard.gif" width="501" height="538" />
 
@@ -16,7 +16,7 @@ SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying
 - Drag the file to your project
 
 ## Usage
-        keyboardTextField = SYKeyboardTextField(point: CGPoint(x: 0, y: 0), width: self.view.bounds.size.width)
+        keyboardTextField = KeyboardTextField(point: CGPoint(x: 0, y: 0), width: self.view.bounds.size.width)
         keyboardTextField.delegate = self
         keyboardTextField.isLeftButtonHidden = false
         keyboardTextField.isRightButtonHidden = false
@@ -40,4 +40,4 @@ SYKeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying
 
 ## License
 
-SYKeyboardTextField is available under the MIT license.
+KeyboardTextField is available under the MIT license.
