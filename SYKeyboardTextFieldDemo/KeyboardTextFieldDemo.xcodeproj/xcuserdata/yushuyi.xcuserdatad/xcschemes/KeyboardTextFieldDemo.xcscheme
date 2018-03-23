@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "22918F5A1A79C48200547672"
-               BuildableName = "SYKeyboardTextFieldDemo.app"
-               BlueprintName = "SYKeyboardTextFieldDemo"
-               ReferencedContainer = "container:SYKeyboardTextFieldDemo.xcodeproj">
+               BuildableName = "KeyboardTextFieldDemo.app"
+               BlueprintName = "KeyboardTextFieldDemo"
+               ReferencedContainer = "container:KeyboardTextFieldDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -31,7 +31,7 @@
                BlueprintIdentifier = "22918F6F1A79C48300547672"
                BuildableName = "SYKeyboardTextFieldDemoTests.xctest"
                BlueprintName = "SYKeyboardTextFieldDemoTests"
-               ReferencedContainer = "container:SYKeyboardTextFieldDemo.xcodeproj">
+               ReferencedContainer = "container:KeyboardTextFieldDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,6 +40,7 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      language = ""
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
@@ -49,7 +50,7 @@
                BlueprintIdentifier = "22918F6F1A79C48300547672"
                BuildableName = "SYKeyboardTextFieldDemoTests.xctest"
                BlueprintName = "SYKeyboardTextFieldDemoTests"
-               ReferencedContainer = "container:SYKeyboardTextFieldDemo.xcodeproj">
+               ReferencedContainer = "container:KeyboardTextFieldDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -57,9 +58,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "22918F5A1A79C48200547672"
-            BuildableName = "SYKeyboardTextFieldDemo.app"
-            BlueprintName = "SYKeyboardTextFieldDemo"
-            ReferencedContainer = "container:SYKeyboardTextFieldDemo.xcodeproj">
+            BuildableName = "KeyboardTextFieldDemo.app"
+            BlueprintName = "KeyboardTextFieldDemo"
+            ReferencedContainer = "container:KeyboardTextFieldDemo.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -69,6 +70,7 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      language = ""
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -80,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "22918F5A1A79C48200547672"
-            BuildableName = "SYKeyboardTextFieldDemo.app"
-            BlueprintName = "SYKeyboardTextFieldDemo"
-            ReferencedContainer = "container:SYKeyboardTextFieldDemo.xcodeproj">
+            BuildableName = "KeyboardTextFieldDemo.app"
+            BlueprintName = "KeyboardTextFieldDemo"
+            ReferencedContainer = "container:KeyboardTextFieldDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -99,9 +101,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "22918F5A1A79C48200547672"
-            BuildableName = "SYKeyboardTextFieldDemo.app"
-            BlueprintName = "SYKeyboardTextFieldDemo"
-            ReferencedContainer = "container:SYKeyboardTextFieldDemo.xcodeproj">
+            BuildableName = "KeyboardTextFieldDemo.app"
+            BlueprintName = "KeyboardTextFieldDemo"
+            ReferencedContainer = "container:KeyboardTextFieldDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

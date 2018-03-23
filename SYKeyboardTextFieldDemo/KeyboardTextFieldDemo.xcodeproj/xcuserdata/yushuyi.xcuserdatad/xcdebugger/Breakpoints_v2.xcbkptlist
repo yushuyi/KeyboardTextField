@@ -42,13 +42,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../SYKeyboardTextField/SYKeyboardTextField.swift"
-            timestampString = "536639324.416584"
+            timestampString = "542164671.457925"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "472"
             endingLineNumber = "472"
-            landmarkName = "setTapButtonHidden(_:)"
-            landmarkType = "7">
+            landmarkName = "SYKeyboardTextField"
+            landmarkType = "21">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -58,12 +58,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../SYKeyboardTextField/SYKeyboardTextField.swift"
-            timestampString = "536639324.417045"
+            timestampString = "542164671.460621"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "357"
             endingLineNumber = "357"
-            landmarkName = "observeValue(forKeyPath:of:change:context:)"
+            landmarkName = "appropriateInputbarHeight()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -74,12 +74,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../SYKeyboardTextField/SYKeyboardTextField.swift"
-            timestampString = "536639324.417335"
+            timestampString = "542164671.460992"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "230"
             endingLineNumber = "230"
-            landmarkName = "layoutSubviews()"
+            landmarkName = "clearTestColor()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

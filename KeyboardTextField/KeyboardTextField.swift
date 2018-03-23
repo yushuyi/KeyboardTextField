@@ -1,5 +1,5 @@
 //
-//  SYKeyboardTextField.swift
+//  KeyboardTextField.swift
 //  DoudouApp
 //  Version 3.2 iOS 8.0 and Swift 4 and Xcode9.2
 //  Created by yushuyi on 15/1/17.
@@ -8,39 +8,39 @@
 
 import UIKit
 
-@objc public protocol SYKeyboardTextFieldDelegate : class {
+@objc public protocol KeyboardTextFieldDelegate : class {
 
     /**
     点击左边按钮的委托
     */
-    @objc optional func keyboardTextFieldPressLeftButton(_ keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldPressLeftButton(_ keyboardTextField :KeyboardTextField)
    
     /**
     点击右边按钮的委托
     */
-    @objc optional func keyboardTextFieldPressRightButton(_ keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldPressRightButton(_ keyboardTextField :KeyboardTextField)
 
     /**
     点击键盘上面的回车按钮响应委托
     */
-    @objc optional func keyboardTextFieldPressReturnButton(_ keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldPressReturnButton(_ keyboardTextField :KeyboardTextField)
     
-    @objc optional func keyboardTextFieldWillBeginEditing(_ keyboardTextField :SYKeyboardTextField)
-    @objc optional func keyboardTextFieldDidBeginEditing(_ keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldWillBeginEditing(_ keyboardTextField :KeyboardTextField)
+    @objc optional func keyboardTextFieldDidBeginEditing(_ keyboardTextField :KeyboardTextField)
 
-    @objc optional func keyboardTextFieldWillEndEditing(_ keyboardTextField :SYKeyboardTextField)
-    @objc optional func keyboardTextFieldDidEndEditing(_ keyboardTextField :SYKeyboardTextField)
+    @objc optional func keyboardTextFieldWillEndEditing(_ keyboardTextField :KeyboardTextField)
+    @objc optional func keyboardTextFieldDidEndEditing(_ keyboardTextField :KeyboardTextField)
 
     
     /**
     键盘文本内容被改变时触发
     - parameter text:              本次写入的值
     */
-    @objc optional func keyboardTextField(_ keyboardTextField :SYKeyboardTextField , didChangeText text:String)
+    @objc optional func keyboardTextField(_ keyboardTextField :KeyboardTextField , didChangeText text:String)
 
 }
 
-fileprivate var SYKeyboardTextFieldDebugMode : Bool = false
+fileprivate var KeyboardTextFieldDebugMode : Bool = false
 
 fileprivate var keyboardViewDefaultHeight : CGFloat = 48.0
 fileprivate let textViewDefaultHeight : CGFloat = 36.0
@@ -48,7 +48,7 @@ fileprivate let textViewDefaultHeight : CGFloat = 36.0
 
 
 
-open class SYKeyboardTextField: UIView {
+open class KeyboardTextField: UIView {
     
     public enum AttachmentViewLocation {
         case up
@@ -56,7 +56,7 @@ open class SYKeyboardTextField: UIView {
     }
     
     //Delegate
-    open weak var delegate : SYKeyboardTextFieldDelegate?
+    open weak var delegate : KeyboardTextFieldDelegate?
     
     //Init
     public convenience init(point : CGPoint,width : CGFloat) {
@@ -106,23 +106,24 @@ open class SYKeyboardTextField: UIView {
         leftButton.backgroundColor = UIColor.red
         leftButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
         leftButton.setTitle("Left", for: .normal)
-        leftButton.addTarget(self, action: #selector(SYKeyboardTextField.leftButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        leftButton.addTarget(self, action: #selector(KeyboardTextField.leftButtonAction(_:)), for: UIControlEvents.touchUpInside)
         keyboardView.addSubview(leftButton)
         
         rightButton.backgroundColor = UIColor.red
         rightButton.titleLabel?.font = UIFont.systemFont(ofSize: 14.0)
         rightButton.setTitle("Right", for: .normal)
-        rightButton.addTarget(self, action: #selector(SYKeyboardTextField.rightButtonAction(_:)), for: UIControlEvents.touchUpInside)
+        rightButton.addTarget(self, action: #selector(KeyboardTextField.rightButtonAction(_:)), for: UIControlEvents.touchUpInside)
         keyboardView.addSubview(rightButton)
         
         registeringKeyboardNotification()
         
         
         //当键盘的高度改变时，keyboardTextField 会吸附会去，这的过程中间会看到底部 透明蒙层，效果不好 加上这个视图以作修饰
-        let bottomBackgroundView = UIView(frame: CGRect(x: 0, y: bounds.size.height, width: bounds.size.width, height: 100))
+        bottomBackgroundView.frame = CGRect(x: 0, y: bounds.size.height, width: bounds.size.width, height: 100)
         bottomBackgroundView.autoresizingMask = [.flexibleTopMargin,.flexibleWidth]
         bottomBackgroundView.backgroundColor = UIColor(red: 210.0/255.0, green: 213.0/255.0, blue: 219.0/255.0, alpha: 1.0)
         bottomBackgroundView.isUserInteractionEnabled = false
+        bottomBackgroundView.isHidden = true
         insertSubview(bottomBackgroundView, at: 0)
         
     }
@@ -138,6 +139,7 @@ open class SYKeyboardTextField: UIView {
         }
         attachmentView?.moveToBottom()
         delegate?.keyboardTextFieldWillEndEditing?(self)
+        bottomBackgroundView.isHidden = true
         isEditing = false
         isHideing = true
         
@@ -227,6 +229,7 @@ open class SYKeyboardTextField: UIView {
     public lazy var textViewBackground = UIImageView()
     public lazy var leftButton = UIButton()
     public lazy var rightButton = UIButton()
+    public lazy var bottomBackgroundView = UIView()
     public func clearTestColor() {
         backgroundColor = UIColor.clear
         leftButton.backgroundColor = UIColor.clear
@@ -328,7 +331,7 @@ open class SYKeyboardTextField: UIView {
     }
  
     deinit {
-        if SYKeyboardTextFieldDebugMode {
+        if KeyboardTextFieldDebugMode {
             print("\(NSStringFromClass(classForCoder)) has release!")
         }
         
@@ -342,7 +345,7 @@ open class SYKeyboardTextField: UIView {
 }
 
 //MARK: TextViewHeight
-extension SYKeyboardTextField {
+extension KeyboardTextField {
 
     fileprivate func textViewCurrentHeightForLines(_ numberOfLines : Int) -> CGFloat {
         var height = textViewDefaultHeight - textView.font!.lineHeight
@@ -376,7 +379,7 @@ extension SYKeyboardTextField {
         guard let object = object as? SYKeyboardTextView,let change = change else { return }
         
         if object == textView && keyPath == "contentSize" {
-            if SYKeyboardTextFieldDebugMode {
+            if KeyboardTextFieldDebugMode {
                 if let sizeValue = (change[NSKeyValueChangeKey.newKey] as? NSValue)?.cgSizeValue {
                     print("\(sizeValue)---\(appropriateInputbarHeight())")
                 }
@@ -401,7 +404,7 @@ extension SYKeyboardTextField {
 }
 
 //MARK: Keyboard Notification
-extension SYKeyboardTextField {
+extension KeyboardTextField {
     
     public var keyboardAnimationOptions : UIViewAnimationOptions {
         return  UIViewAnimationOptions(rawValue: (7 as UInt) << 16)
@@ -413,11 +416,11 @@ extension SYKeyboardTextField {
     func registeringKeyboardNotification() {
         //  Registering for keyboard notification.
         
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardWillChangeFrame(_:)),name:NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.keyboardDidChangeFrame(_:)),name:NSNotification.Name.UIKeyboardDidChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(KeyboardTextField.keyboardWillChangeFrame(_:)),name:NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(KeyboardTextField.keyboardDidChangeFrame(_:)),name:NSNotification.Name.UIKeyboardDidChangeFrame, object: nil)
         
         //  Registering for orientation changes notification
-        NotificationCenter.default.addObserver(self, selector: #selector(SYKeyboardTextField.willChangeStatusBarOrientation(_:)),name: NSNotification.Name.UIApplicationWillChangeStatusBarOrientation, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(KeyboardTextField.willChangeStatusBarOrientation(_:)),name: NSNotification.Name.UIApplicationWillChangeStatusBarOrientation, object: nil)
     
     }
     
@@ -429,7 +432,7 @@ extension SYKeyboardTextField {
         let keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
         let keyboardFrame = keyboardFrameValue.cgRectValue
         lastKeyboardFrame = superview!.convert(keyboardFrame, from: UIApplication.shared.keyWindow)
-        if SYKeyboardTextFieldDebugMode {
+        if KeyboardTextFieldDebugMode {
             print("keyboardFrame : \(keyboardFrame)")
         }
         
@@ -454,7 +457,7 @@ extension SYKeyboardTextField {
             }
             if self.isEditing && self.isShowing {
                 self.attachmentView?.moveToTop()
-                
+                self.bottomBackgroundView.isHidden = false
                 self.isShowing = false
                 self.delegate?.keyboardTextFieldDidBeginEditing?(self)
             }
@@ -468,7 +471,7 @@ extension SYKeyboardTextField {
 
 
 //MARK: TapButtonAction
-extension SYKeyboardTextField {
+extension KeyboardTextField {
     
     @objc func leftButtonAction(_ button : UIButton) {
         delegate?.keyboardTextFieldPressLeftButton?(self)
@@ -508,7 +511,7 @@ extension SYKeyboardTextField {
     override open func didMoveToSuperview() {
         if let superview = superview {
             let tapButton = UIButton(frame: superview.bounds)
-            tapButton.addTarget(self, action: #selector(SYKeyboardTextField.tapAction(_:)), for: UIControlEvents.touchUpInside)
+            tapButton.addTarget(self, action: #selector(KeyboardTextField.tapAction(_:)), for: UIControlEvents.touchUpInside)
             tapButton.tag = tapButtonTag
             tapButton.isHidden = true
             tapButton.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
@@ -527,7 +530,7 @@ extension SYKeyboardTextField {
 
 
 //MARK: UITextViewDelegate
-extension SYKeyboardTextField : UITextViewDelegate {
+extension KeyboardTextField : UITextViewDelegate {
     
     public func textViewDidChange(_ textView: UITextView) {
         
@@ -618,8 +621,6 @@ extension UIView {
     fileprivate func ktf_toBottom(offset : CGFloat = 0.0) {
         if let superView = superview {
             frame.origin.y = superView.bounds.size.height - offset - frame.size.height;
-        }else {
-            print("UIView+SYAutoLayout toBottom 没有 superview");
         }
     }
     

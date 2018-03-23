@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  SYKeyboardTextFieldDemo
+//  KeyboardTextFieldDemo
 //
 //  Created by yushuyi on 15/1/29.
 //  Copyright (c) 2015年 yushuyi. All rights reserved.
@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    var keyboardTextField : SYKeyboardTextField!
+    var keyboardTextField : KeyboardTextField!
     
     
     override func loadView() {
@@ -40,15 +40,15 @@ class ViewController: UIViewController {
     }
 }
 
-//MARK: SYKeyboardTextFieldDelegate
-extension ViewController : SYKeyboardTextFieldDelegate {
-    func keyboardTextFieldPressReturnButton(_ keyboardTextField: SYKeyboardTextField) {
+//MARK: KeyboardTextFieldDelegate
+extension ViewController : KeyboardTextFieldDelegate {
+    func keyboardTextFieldPressReturnButton(_ keyboardTextField: KeyboardTextField) {
         UIAlertView(title: "", message: "Action", delegate: nil, cancelButtonTitle: "OK").show()
     }
 }
 
 
-class DNKeyboardTextField : SYKeyboardTextField {
+class DNKeyboardTextField : KeyboardTextField {
 
     override init(frame : CGRect) {
         super.init(frame : frame)
