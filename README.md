@@ -1,10 +1,10 @@
 <p align="center">
-<img src="https://github.com/441088327/SYKeyboardTextField/blob/master/logo.png" alt="" />
+<img src="https://github.com/441088327/KeyboardTextField/blob/master/logo.png" alt="" />
 </p>
 
 KeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying input box! Write in Swift! 
 
-<img src="https://github.com/441088327/SYKeyboardTextField/blob/master/SYKeyboard.gif" width="501" height="538" />
+<img src="https://github.com/441088327/KeyboardTextField/blob/master/SYKeyboard.gif" width="501" height="538" />
 
 ## Requirements
 
@@ -26,7 +26,7 @@ KeyboardTextField is a lightweight, simple, non-invasive keyboard accompanying i
 ## How to custom UI Style ?
         //UI
         lazy var keyboardView = UIView()
-        lazy var textView : SYKeyboardTextView = SYKeyboardTextView()
+        lazy var textView : KeyboardTextView = KeyboardTextView()
         lazy var placeholderLabel = UILabel()
         lazy var textViewBackground = UIImageView()
         lazy var leftButton = UIButton()
